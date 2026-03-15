@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Dich vu{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div>
+        <h1 class="mb-2">Dich vu</h1>
+        <p class="section-subtitle">Danh muc ky thuat, don gia va thoi gian thuc hien uoc tinh.</p>
+    </div>
+    <a class="btn-primary" href="{% url 'service-create' %}"><i data-lucide="plus" class="icon-sm"></i>Them dich vu</a>
+</div>
+<div class="table-shell fade-in">
+    <div class="overflow-x-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ten</th>
+                    <th>Gia</th>
+                    <th>Thoi gian</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in services %}
+                    <tr class="table-row">
+                        <td>{{ service.name }}</td>
+                        <td>{{ service.price }}</td>
+                        <td>{{ service.estimated_duration }}</td>
+                        <td class="text-right">
+                            <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'service-update' service.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sua</a>
+                            <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'service-delete' service.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xoa</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="table-row"><td colspan="4" class="text-[var(--color-ink-500)]">Chua co dich vu.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

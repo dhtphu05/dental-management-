@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Lich hen{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div>
+        <h1 class="mb-2">Lich hen</h1>
+        <p class="section-subtitle">Dieu phoi lich bac si va theo doi trang thai tiep nhan.</p>
+    </div>
+    <a class="btn-primary" href="{% url 'appointment-create' %}"><i data-lucide="calendar-plus-2" class="icon-sm"></i>Them lich hen</a>
+</div>
+<div class="table-shell fade-in">
+    <div class="overflow-x-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Benh nhan</th>
+                    <th>Bac si</th>
+                    <th>Ngay</th>
+                    <th>Gio</th>
+                    <th>Trang thai</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                    <tr class="table-row">
+                        <td><a href="{% url 'appointment-detail' appointment.pk %}">{{ appointment.patient.full_name }}</a></td>
+                        <td>{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</td>
+                        <td>{{ appointment.date }}</td>
+                        <td>{{ appointment.time_slot|time:"H:i" }}</td>
+                        <td>{{ appointment.get_status_display }}</td>
+                        <td class="text-right">
+                            <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'appointment-update' appointment.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sua</a>
+                            <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'appointment-delete' appointment.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xoa</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="table-row"><td colspan="6" class="text-[var(--color-ink-500)]">Chua co lich hen.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

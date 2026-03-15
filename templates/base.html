@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Dental Project{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    {% block extra_head %}{% endblock %}
+    <style type="text/tailwindcss">
+        @theme {
+            --color-brand-50: #E3F2FD;
+            --color-brand-500: #2196F3;
+            --color-brand-700: #1565C0;
+            --color-porcelain: #F8FAFC;
+            --color-ink-900: #0f172a;
+            --color-ink-700: #334155;
+            --color-ink-500: #64748b;
+            --shadow-soft: 0 16px 40px rgba(21, 101, 192, 0.08);
+            --shadow-soft-hover: 0 22px 52px rgba(21, 101, 192, 0.12);
+            --radius-shell: 1.75rem;
+        }
+
+        @layer base {
+            html { font-family: "Inter", sans-serif; }
+            body { @apply bg-[var(--color-porcelain)] text-[var(--color-ink-900)] antialiased; }
+            h1 { @apply text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--color-ink-900)]; }
+            h2 { @apply text-xl md:text-2xl font-bold tracking-tight text-[var(--color-ink-900)]; }
+            h3 { @apply text-lg font-semibold text-[var(--color-ink-900)]; }
+            p, li, td, th, label, input, select, textarea { @apply text-sm md:text-[0.95rem]; }
+            input, select, textarea {
+                @apply w-full rounded-2xl border-0 bg-white/90 px-4 py-3 text-[var(--color-ink-900)] shadow-[0_6px_20px_rgba(15,23,42,0.05)] outline-none ring-1 ring-slate-200/70 transition duration-200 placeholder:text-slate-400 focus:ring-2 focus:ring-[var(--color-brand-500)]/40;
+            }
+            input[type="checkbox"] {
+                @apply h-5 w-5 rounded-lg p-0 accent-[var(--color-brand-500)] shadow-none ring-0;
+            }
+            table { @apply w-full border-collapse; }
+            thead th { @apply px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ink-500)]; }
+            tbody td { @apply px-6 py-4 align-middle text-[var(--color-ink-700)]; }
+        }
+
+        @layer components {
+            .app-shell { @apply mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8; }
+            .topbar { @apply sticky top-4 z-20 mx-auto mb-8 flex max-w-7xl items-center justify-between rounded-[2rem] bg-white/80 px-5 py-4 shadow-[var(--shadow-soft)] backdrop-blur-xl; }
+            .nav-links { @apply hidden items-center gap-2 lg:flex; }
+            .nav-link { @apply inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium text-[var(--color-ink-700)] transition duration-200 hover:scale-[1.02] hover:bg-[var(--color-brand-50)] hover:text-[var(--color-brand-700)]; }
+            .brand-mark { @apply inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-linear-to-br from-[var(--color-brand-500)] to-[var(--color-brand-700)] text-lg font-black text-white shadow-[var(--shadow-soft)]; }
+            .hero-panel { @apply rounded-[2rem] bg-linear-to-br from-white via-[#fafdff] to-[var(--color-brand-50)] p-6 shadow-[var(--shadow-soft)] md:p-8; }
+            .surface-card { @apply rounded-[2rem] bg-white/92 p-6 shadow-[var(--shadow-soft)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft-hover)]; }
+            .surface-card-danger { @apply rounded-[2rem] bg-white p-6 shadow-[var(--shadow-soft)] ring-1 ring-rose-100; }
+            .metric-card { @apply rounded-3xl bg-white/95 p-5 shadow-[var(--shadow-soft)] transition duration-300 hover:scale-[1.02]; }
+            .btn-primary { @apply inline-flex items-center justify-center rounded-2xl bg-[var(--color-brand-500)] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(33,150,243,0.25)] transition duration-200 hover:scale-[1.03] hover:bg-[var(--color-brand-700)]; }
+            .btn-secondary { @apply inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[var(--color-brand-700)] shadow-[var(--shadow-soft)] ring-1 ring-slate-200/70 transition duration-200 hover:scale-[1.03] hover:bg-[var(--color-brand-50)]; }
+            .btn-danger { @apply inline-flex items-center justify-center rounded-2xl bg-rose-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(244,63,94,0.22)] transition duration-200 hover:scale-[1.03] hover:bg-rose-600; }
+            .btn-ghost { @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-semibold text-[var(--color-ink-700)] transition duration-200 hover:scale-[1.02] hover:bg-slate-100; }
+            .section-title { @apply mb-1 text-2xl font-bold tracking-tight text-[var(--color-ink-900)]; }
+            .section-subtitle { @apply text-sm text-[var(--color-ink-500)]; }
+            .table-shell { @apply overflow-hidden rounded-[2rem] bg-white shadow-[var(--shadow-soft)]; }
+            .table-row { @apply border-t border-slate-100/80 transition duration-200 hover:bg-[var(--color-brand-50)]/45; }
+            .badge-soft { @apply inline-flex items-center rounded-full bg-[var(--color-brand-50)] px-3 py-1 text-xs font-semibold text-[var(--color-brand-700)]; }
+            .fade-in { animation: fadeInUp .6s ease-out both; }
+            .fade-in-delay-1 { animation: fadeInUp .7s ease-out both; }
+            .fade-in-delay-2 { animation: fadeInUp .8s ease-out both; }
+            .checkbox-grid { @apply grid grid-cols-2 gap-3 md:grid-cols-4; }
+            .checkbox-grid label { @apply flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-medium text-[var(--color-ink-700)] transition duration-200 hover:bg-[var(--color-brand-50)]; }
+            .slot-button { @apply flex min-h-16 items-center justify-center rounded-3xl bg-white px-3 py-4 text-center text-sm font-semibold text-[var(--color-brand-700)] shadow-[var(--shadow-soft)] ring-1 ring-slate-200/70 transition duration-200 hover:scale-[1.03] hover:bg-[var(--color-brand-50)]; }
+            .slot-button-disabled { @apply cursor-not-allowed bg-slate-100 text-slate-400 shadow-none ring-1 ring-slate-200 opacity-70 hover:scale-100 hover:bg-slate-100; }
+            .slot-button-active { @apply bg-[var(--color-brand-500)] text-white ring-0 shadow-[0_18px_36px_rgba(33,150,243,0.3)] animate-pulse; }
+            .booking-cta { @apply inline-flex w-full items-center justify-center rounded-full bg-[var(--color-brand-700)] px-8 py-5 text-base font-bold text-white shadow-[0_20px_44px_rgba(21,101,192,0.34)] transition duration-200 hover:scale-[1.02] hover:bg-[var(--color-brand-500)]; }
+            .step-chip { @apply flex items-center gap-3 rounded-3xl bg-white/85 px-4 py-3 shadow-[var(--shadow-soft)] transition duration-200; }
+            .step-chip-active { @apply bg-[var(--color-brand-500)] text-white shadow-[0_16px_36px_rgba(33,150,243,0.28)]; }
+            .step-chip-done { @apply bg-[var(--color-brand-50)] text-[var(--color-brand-700)]; }
+            .progress-track { @apply h-2 overflow-hidden rounded-full bg-slate-200; }
+            .progress-bar { @apply h-full rounded-full bg-linear-to-r from-[var(--color-brand-500)] to-[var(--color-brand-700)] transition-all duration-300; }
+            .summary-row { @apply flex items-center justify-between rounded-3xl bg-slate-50 px-4 py-4; }
+            .tooth-tile { @apply group flex flex-col items-center gap-3 rounded-[1.75rem] bg-white px-3 py-4 shadow-[var(--shadow-soft)] ring-1 ring-slate-200/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-soft-hover)]; }
+            .tooth-tile-cavity { @apply bg-rose-50 ring-rose-200/80; }
+            .tooth-tile-treated { @apply bg-sky-50 ring-sky-200/90; }
+            .tooth-tile-missing { @apply bg-slate-100 ring-slate-300/80; }
+            .tooth-svg { @apply h-16 w-12 transition-transform duration-300 group-hover:scale-105; }
+            .tooth-number { @apply text-xs font-bold tracking-[0.14em] text-[var(--color-ink-500)]; }
+            .tooth-status-pill { @apply rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]; }
+            .modal-shell { @apply fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm; }
+            .modal-panel { @apply w-full max-w-md rounded-[2rem] bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.2)]; }
+            .icon-sm { @apply h-4 w-4; }
+            .icon-md { @apply h-5 w-5; }
+            .doctor-shell { @apply grid gap-6 lg:grid-cols-[auto_1fr]; }
+            .doctor-sidebar { @apply sticky top-6 flex h-fit flex-col gap-4 rounded-[2rem] bg-white p-4 shadow-[var(--shadow-soft)] transition-all duration-300; }
+            .doctor-sidebar-collapsed { @apply lg:w-24; }
+            .doctor-sidebar-expanded { @apply lg:w-72; }
+            .doctor-sidebar-link { @apply flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-ink-700)] transition duration-200 hover:bg-[var(--color-brand-50)] hover:text-[var(--color-brand-700)]; }
+            .doctor-sidebar-link-active { @apply bg-[var(--color-brand-50)] text-[var(--color-brand-700)]; }
+            .doctor-sidebar-text { @apply whitespace-nowrap; }
+            .doctor-main { @apply min-w-0 space-y-6; }
+            .doctor-stat-card { @apply rounded-[24px] bg-white p-5 shadow-[var(--shadow-soft)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft-hover)]; }
+            .doctor-stat-icon { @apply flex h-14 w-14 items-center justify-center rounded-[24px] bg-[var(--color-brand-50)] text-[var(--color-brand-700)]; }
+            .doctor-table { @apply w-full border-separate border-spacing-y-3; }
+            .doctor-table thead th { @apply px-5 py-2 text-left text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ink-500)]; }
+            .doctor-table tbody td { @apply bg-white px-5 py-4 text-[var(--color-ink-700)] transition duration-200; }
+            .doctor-table tbody tr:hover td { @apply bg-[var(--color-brand-50)]; }
+            .doctor-table tbody td:first-child { @apply rounded-l-[24px]; }
+            .doctor-table tbody td:last-child { @apply rounded-r-[24px]; }
+            .doctor-chart-card { @apply rounded-[2rem] bg-white p-6 shadow-[var(--shadow-soft)]; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-shell pb-0">
+        <nav class="topbar fade-in">
+            <a class="flex items-center gap-4" href="{% url 'dashboard' %}">
+                <span class="brand-mark">DN</span>
+                <span>
+                    <span class="block text-base font-extrabold tracking-tight text-[var(--color-ink-900)]">Dental Project</span>
+                    <span class="block text-xs text-[var(--color-ink-500)]">Modern clinic interface</span>
+                </span>
+            </a>
+            {% if request.user.is_authenticated and request.user.role != "patient" %}
+                <div class="nav-links">
+                    <a class="nav-link" href="{% url 'patient-list' %}"><i data-lucide="users" class="icon-sm"></i>Benh nhan</a>
+                    <a class="nav-link" href="{% url 'appointment-list' %}"><i data-lucide="calendar-days" class="icon-sm"></i>Lich hen</a>
+                    <a class="nav-link" href="{% url 'service-list' %}"><i data-lucide="stethoscope" class="icon-sm"></i>Dich vu</a>
+                    <a class="nav-link" href="{% url 'invoice-list' %}"><i data-lucide="receipt-text" class="icon-sm"></i>Hoa don</a>
+                    <a class="nav-link" href="{% url 'design-system' %}"><i data-lucide="swatch-book" class="icon-sm"></i>Design System</a>
+                </div>
+            {% endif %}
+            <div class="flex items-center gap-3">
+                {% if request.user.is_authenticated %}
+                    <span class="hidden items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-[var(--color-ink-700)] md:inline-flex"><i data-lucide="user-round" class="icon-sm"></i>{{ request.user }}</span>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button class="btn-secondary !px-4 !py-2" type="submit"><i data-lucide="log-out" class="icon-sm"></i>Dang xuat</button>
+                    </form>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+    <main class="app-shell pt-2">
+        {% block content %}{% endblock %}
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

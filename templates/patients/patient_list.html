@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Benh nhan{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div>
+        <h1 class="mb-2">Benh nhan</h1>
+        <p class="section-subtitle">Quan ly ho so, thong tin lien he va lich su kham benh.</p>
+    </div>
+    <a class="btn-primary" href="{% url 'patient-create' %}"><i data-lucide="user-plus" class="icon-sm"></i>Them benh nhan</a>
+</div>
+<div class="table-shell fade-in">
+    <div class="overflow-x-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ho ten</th>
+                    <th>Dien thoai</th>
+                    <th>Ngay sinh</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                    <tr class="table-row">
+                        <td><a href="{% url 'patient-detail' patient.pk %}">{{ patient.full_name }}</a></td>
+                        <td>{{ patient.phone }}</td>
+                        <td>{{ patient.date_of_birth|default:"-" }}</td>
+                        <td class="text-right">
+                            <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'patient-update' patient.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sua</a>
+                            <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'patient-delete' patient.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xoa</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="table-row"><td colspan="4" class="text-[var(--color-ink-500)]">Chua co benh nhan.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

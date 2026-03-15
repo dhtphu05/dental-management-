@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl">
+    <div class="surface-card fade-in">
+        <h1 class="mb-2">{{ page_title }}</h1>
+        <p class="section-subtitle mb-6">Nhập thông tin theo biểu mẫu chuẩn của hệ thống nha khoa.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="grid gap-5">
+                        {% for field in form %}
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}<div class="mt-2 text-sm text-[var(--color-ink-500)]">{{ field.help_text }}</div>{% endif %}
+                            {% for error in field.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <button class="btn-primary" type="submit"><i data-lucide="save" class="icon-sm"></i>Luu</button>
+                        <a class="btn-secondary" href="javascript:history.back()"><i data-lucide="arrow-left" class="icon-sm"></i>Huy</a>
+                    </div>
+                </form>
+    </div>
+</div>
+{% endblock %}

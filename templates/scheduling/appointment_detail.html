@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Chi tiet lich hen{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+        <h1 class="mb-2">{{ appointment.patient.full_name }}</h1>
+        <p class="section-subtitle">{{ appointment.date }} {{ appointment.time_slot|time:"H:i" }}</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+        <a class="btn-secondary" href="{% url 'appointment-update' appointment.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sua</a>
+        {% if request.user.role == "doctor" %}
+            <a class="btn-primary" href="{% url 'doctor-treatment-plan' appointment.pk %}"><i data-lucide="file-pen-line" class="icon-sm"></i>Lieu trinh</a>
+        {% endif %}
+    </div>
+</div>
+<div class="surface-card fade-in">
+    <p><strong>Bac si:</strong> {{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</p>
+    <p><strong>Trang thai:</strong> {{ appointment.get_status_display }}</p>
+    <p><strong>Ly do:</strong> {{ appointment.reason|default:"-" }}</p>
+    <p><strong>Ghi chu:</strong> {{ appointment.notes|default:"-" }}</p>
+</div>
+{% endblock %}

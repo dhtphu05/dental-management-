@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Bac si{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="doctor-shell">
+    <aside id="doctor-sidebar" class="doctor-sidebar doctor-sidebar-expanded fade-in">
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <span class="doctor-stat-icon !h-12 !w-12"><i data-lucide="stethoscope" class="icon-md"></i></span>
+                <div class="doctor-sidebar-text">
+                    <div class="text-sm font-semibold text-[var(--color-ink-900)]">Workspace Bac si</div>
+                    <div class="text-xs text-[var(--color-ink-500)]">{{ request.user.get_full_name|default:request.user.username }}</div>
+                </div>
+            </div>
+            <button id="sidebar-toggle" type="button" class="btn-ghost !px-3 !py-2">
+                <i id="sidebar-toggle-icon" data-lucide="panel-left-close" class="icon-sm"></i>
+            </button>
+        </div>
+
+        <nav class="mt-2 space-y-2">
+            <a class="doctor-sidebar-link doctor-sidebar-link-active" href="{% url 'dashboard' %}">
+                <i data-lucide="layout-dashboard" class="icon-md"></i>
+                <span class="doctor-sidebar-text">Tong quan</span>
+            </a>
+            <a class="doctor-sidebar-link" href="{% url 'appointment-list' %}">
+                <i data-lucide="calendar-days" class="icon-md"></i>
+                <span class="doctor-sidebar-text">Lich hen</span>
+            </a>
+            <a class="doctor-sidebar-link" href="{% url 'patient-list' %}">
+                <i data-lucide="users" class="icon-md"></i>
+                <span class="doctor-sidebar-text">Benh nhan</span>
+            </a>
+            <a class="doctor-sidebar-link" href="{% url 'service-list' %}">
+                <i data-lucide="notebook-pen" class="icon-md"></i>
+                <span class="doctor-sidebar-text">Lieu trinh</span>
+            </a>
+        </nav>
+    </aside>
+
+    <div class="doctor-main">
+        <section class="hero-panel fade-in flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <div>
+                <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-brand-700)]">Doctor Dashboard</p>
+                <h1 class="mb-2">Buc tranh cong viec hom nay</h1>
+                <p class="section-subtitle">Theo doi luong benh nhan, doanh thu lien quan va cac lich hen trong ngay {{ today|date:"d/m/Y" }}.</p>
+            </div>
+            <a class="btn-primary" href="{% url 'appointment-list' %}">
+                <i data-lucide="calendar-plus-2" class="icon-sm"></i>
+                Mo lich hen
+            </a>
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-3">
+            <article class="doctor-stat-card fade-in">
+                <div class="mb-5 flex items-center justify-between">
+                    <div class="doctor-stat-icon"><i data-lucide="users-round" class="icon-md"></i></div>
+                    <span class="badge-soft">Tong so</span>
+                </div>
+                <div class="text-sm font-semibold text-[var(--color-ink-500)]">Tong benh nhan</div>
+                <div class="mt-2 text-3xl font-extrabold text-[var(--color-ink-900)]">{{ doctor_patient_count }}</div>
+            </article>
+
+            <article class="doctor-stat-card fade-in-delay-1">
+                <div class="mb-5 flex items-center justify-between">
+                    <div class="doctor-stat-icon"><i data-lucide="wallet" class="icon-md"></i></div>
+                    <span class="badge-soft">Da phat sinh</span>
+                </div>
+                <div class="text-sm font-semibold text-[var(--color-ink-500)]">Doanh thu</div>
+                <div class="mt-2 text-3xl font-extrabold text-[var(--color-ink-900)]">{{ doctor_revenue }}</div>
+            </article>
+
+            <article class="doctor-stat-card fade-in-delay-2">
+                <div class="mb-5 flex items-center justify-between">
+                    <div class="doctor-stat-icon"><i data-lucide="calendar-clock" class="icon-md"></i></div>
+                    <span class="badge-soft">Hom nay</span>
+                </div>
+                <div class="text-sm font-semibold text-[var(--color-ink-500)]">Lich hen hom nay</div>
+                <div class="mt-2 text-3xl font-extrabold text-[var(--color-ink-900)]">{{ today_appointment_count }}</div>
+            </article>
+        </section>
+
+        <section class="grid gap-6 xl:grid-cols-[1.35fr_1fr]">
+            <div class="doctor-chart-card fade-in">
+                <div class="mb-6 flex items-center justify-between gap-4">
+                    <div>
+                        <h2 class="section-title !text-xl">Luu luong benh nhan</h2>
+                        <p class="section-subtitle">Bieu do 7 ngay gan nhat cho bac si.</p>
+                    </div>
+                    <span class="badge-soft"><i data-lucide="chart-line" class="icon-sm"></i>Weekly Trend</span>
+                </div>
+                <div class="h-80">
+                    <canvas id="doctorLineChart"></canvas>
+                </div>
+            </div>
+
+            <div class="surface-card fade-in-delay-1">
+                <div class="mb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="section-title !text-xl">Nhip do hom nay</h2>
+                        <p class="section-subtitle">Tong hop nhanh cac lich hen dang xu ly.</p>
+                    </div>
+                    <i data-lucide="activity" class="icon-md text-[var(--color-brand-700)]"></i>
+                </div>
+                <div class="space-y-3">
+                    {% for appointment in today_appointments %}
+                        <div class="rounded-[24px] bg-slate-50 px-4 py-4 transition duration-200 hover:bg-[var(--color-brand-50)]">
+                            <div class="flex items-center justify-between gap-3">
+                                <div>
+                                    <div class="font-semibold text-[var(--color-ink-900)]">{{ appointment.patient.full_name }}</div>
+                                    <div class="mt-1 text-sm text-[var(--color-ink-500)]">{{ appointment.reason|default:"Tai kham dinh ky" }}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold text-[var(--color-brand-700)]">{{ appointment.time_slot|time:"H:i" }}</div>
+                                    <div class="text-xs uppercase tracking-[0.14em] text-[var(--color-ink-500)]">{{ appointment.get_status_display }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="rounded-[24px] bg-slate-50 px-4 py-5 text-[var(--color-ink-500)]">Hom nay chua co lich hen nao.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="table-shell fade-in-delay-2 p-4">
+            <div class="mb-3 flex items-center justify-between px-2">
+                <div>
+                    <h2 class="section-title !text-xl">Lich hen sap toi</h2>
+                    <p class="section-subtitle">Bang hien dai, khong co duong ke doc, hover xanh nhe va bo goc tung dong.</p>
+                </div>
+                <a class="btn-secondary" href="{% url 'appointment-list' %}">
+                    <i data-lucide="arrow-right" class="icon-sm"></i>
+                    Xem tat ca
+                </a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="doctor-table">
+                    <thead>
+                        <tr>
+                            <th>Benh nhan</th>
+                            <th>Ngay</th>
+                            <th>Khung gio</th>
+                            <th>Trang thai</th>
+                            <th class="text-right">Tac vu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in upcoming_appointments %}
+                            <tr>
+                                <td>
+                                    <div class="font-semibold text-[var(--color-ink-900)]">{{ appointment.patient.full_name }}</div>
+                                    <div class="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-500)]">Patient ID #{{ appointment.patient.pk }}</div>
+                                </td>
+                                <td>{{ appointment.date|date:"d/m/Y" }}</td>
+                                <td>{{ appointment.time_slot|time:"H:i" }}</td>
+                                <td><span class="badge-soft">{{ appointment.get_status_display }}</span></td>
+                                <td class="text-right">
+                                    <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'doctor-treatment-plan' appointment.pk %}">
+                                        <i data-lucide="file-pen-line" class="icon-sm"></i>
+                                        Dieu tri
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="!rounded-[24px] text-[var(--color-ink-500)]">Chua co lich hen sap toi.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</section>
+
+{{ doctor_chart_labels|json_script:"doctor-chart-labels" }}
+{{ doctor_chart_values|json_script:"doctor-chart-values" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const sidebar = document.getElementById("doctor-sidebar");
+        const toggleButton = document.getElementById("sidebar-toggle");
+        const toggleIcon = document.getElementById("sidebar-toggle-icon");
+        const textNodes = Array.from(document.querySelectorAll(".doctor-sidebar-text"));
+
+        toggleButton?.addEventListener("click", () => {
+            const collapsed = sidebar.classList.toggle("doctor-sidebar-collapsed");
+            sidebar.classList.toggle("doctor-sidebar-expanded", !collapsed);
+            textNodes.forEach((node) => node.classList.toggle("hidden", collapsed));
+            if (window.lucide) {
+                toggleIcon.setAttribute("data-lucide", collapsed ? "panel-left-open" : "panel-left-close");
+                window.lucide.createIcons();
+            }
+        });
+
+        const labels = JSON.parse(document.getElementById("doctor-chart-labels").textContent);
+        const values = JSON.parse(document.getElementById("doctor-chart-values").textContent);
+        const canvas = document.getElementById("doctorLineChart");
+        if (!canvas || !window.Chart) return;
+
+        const context = canvas.getContext("2d");
+        const gradient = context.createLinearGradient(0, 0, 0, 280);
+        gradient.addColorStop(0, "rgba(33, 150, 243, 0.45)");
+        gradient.addColorStop(1, "rgba(33, 150, 243, 0.03)");
+
+        new Chart(context, {
+            type: "line",
+            data: {
+                labels,
+                datasets: [{
+                    label: "Benh nhan",
+                    data: values,
+                    borderColor: "#1565C0",
+                    backgroundColor: gradient,
+                    tension: 0.38,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: "#2196F3",
+                    pointBorderColor: "#ffffff",
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: "#64748b" }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: "rgba(148, 163, 184, 0.16)" },
+                        ticks: {
+                            precision: 0,
+                            color: "#64748b"
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

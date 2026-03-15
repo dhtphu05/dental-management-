@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Hoa don{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="mb-2">Hoa don</h1>
+    <p class="section-subtitle">Theo doi phat hanh, thanh toan va tong gia tri dieu tri.</p>
+</div>
+<div class="table-shell fade-in">
+    <div class="overflow-x-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Benh nhan</th>
+                    <th>Bac si</th>
+                    <th>Tong tien</th>
+                    <th>Trang thai</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                    <tr class="table-row">
+                        <td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.treatment_plan.appointment.patient.full_name }}</a></td>
+                        <td>{{ invoice.treatment_plan.appointment.doctor.get_full_name|default:invoice.treatment_plan.appointment.doctor.username }}</td>
+                        <td>{{ invoice.total_amount }}</td>
+                        <td>{{ invoice.get_status_display }}</td>
+                        <td class="text-right">
+                            <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sua</a>
+                            <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'invoice-delete' invoice.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xoa</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="table-row"><td colspan="5" class="text-[var(--color-ink-500)]">Chua co hoa don.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

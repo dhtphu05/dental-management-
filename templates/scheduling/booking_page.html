@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Dat lich hen{% endblock %}
+
+{% block content %}
+<section class="hero-panel fade-in mb-8">
+    <div class="max-w-3xl">
+        <span class="badge-soft mb-4">Booking Experience</span>
+        <h1 class="mb-3">Dat lich hen</h1>
+        <p class="section-subtitle">Quy trinh dat lich da duoc chia thanh 3 buoc de le tan thao tac nhanh, it sai sot va de kiem tra truoc khi xac nhan.</p>
+    </div>
+</section>
+
+<section class="mb-8 surface-card fade-in">
+    <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div class="grid gap-3 md:grid-cols-3">
+            {% for step in booking_steps %}
+                <div class="step-chip" data-step-chip data-step-number="{{ step.number }}">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-sm font-bold text-[var(--color-brand-700)]">{{ step.number }}</span>
+                    <div>
+                        <div class="text-sm font-semibold">{{ step.title }}</div>
+                        <div class="text-xs opacity-75">{{ step.description }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="min-w-56">
+            <div class="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ink-500)]">
+                <span>Tien trinh</span>
+                <span id="progress-label">Buoc 1/3</span>
+            </div>
+            <div class="progress-track">
+                <div id="progress-bar" class="progress-bar" style="width: 33%"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<form method="post" class="space-y-6">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.time_slot }}
+
+    <section class="space-y-6" data-step-panel="1">
+        <div class="surface-card fade-in space-y-5">
+            <div>
+                <h2 class="section-title !text-xl">Buoc 1: Thong tin dat lich</h2>
+                <p class="section-subtitle">Chon benh nhan, bac si va mo ta nhanh nhu cau kham.</p>
+            </div>
+
+            <div class="grid gap-5 lg:grid-cols-2">
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">{{ form.patient.label }}</label>
+                    {{ form.patient }}
+                    {% for error in form.patient.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">{{ form.doctor.label }}</label>
+                    {{ form.doctor }}
+                    {% for error in form.doctor.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">{{ form.reason.label }}</label>
+                {{ form.reason }}
+            </div>
+
+            <div>
+                <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">{{ form.notes.label }}</label>
+                {{ form.notes }}
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" class="btn-primary" data-next-step><i data-lucide="arrow-right" class="icon-sm"></i>Tiep tuc chon lich</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="hidden space-y-6" data-step-panel="2">
+        <div class="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
+            <div class="surface-card fade-in">
+                <div>
+                    <h2 class="section-title !text-xl">Buoc 2: Chon ngay</h2>
+                    <p class="section-subtitle">Lich ben trai dong vai tro calendar. Chon ngay de tai khung gio ben phai.</p>
+                </div>
+
+                <div class="mt-5">
+                    <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">{{ form.date.label }}</label>
+                    {{ form.date }}
+                    {% for error in form.date.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="mt-6 rounded-3xl bg-[var(--color-brand-50)] p-5 text-sm text-[var(--color-ink-700)]">
+                    <p class="font-semibold text-[var(--color-brand-700)]">Luu y</p>
+                    <p class="mt-2">Neu doi bac si hoac ngay, he thong se tu dong tinh lai slot trong ngay do.</p>
+                </div>
+            </div>
+
+            <div class="surface-card fade-in-delay-1">
+            <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h2 class="section-title !text-xl">Buoc 2: Khung gio</h2>
+                    <p class="section-subtitle">Tren mobile, slot xep thanh luoi 3 cot de thao tac nhanh.</p>
+                </div>
+                <div class="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-[var(--color-ink-500)]">
+                    Dang chon: <span id="selected-slot-label" class="font-semibold text-[var(--color-brand-700)]">Chua chon</span>
+                </div>
+            </div>
+
+            {% if form.time_slot.errors %}
+                {% for error in form.time_slot.errors %}
+                    <div class="mb-4 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div id="slot-grid" class="grid grid-cols-3 gap-3 md:grid-cols-4">
+                {% for slot in slot_times %}
+                    <button
+                        type="button"
+                        class="slot-button"
+                        data-slot-button
+                        data-slot="{{ slot }}"
+                    >
+                        {{ slot }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <div class="mt-5 rounded-3xl bg-[var(--color-brand-50)] p-5 text-sm text-[var(--color-ink-700)]">
+                <p class="font-semibold text-[var(--color-brand-700)]">Huong dan</p>
+                <p class="mt-2">Khung gio xam la da co nguoi dat. Khung gio xanh co hieu ung pulse la lua chon hien tai.</p>
+            </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap justify-between gap-3">
+            <button type="button" class="btn-secondary" data-prev-step><i data-lucide="arrow-left" class="icon-sm"></i>Quay lai</button>
+            <button type="button" class="btn-primary" data-next-step><i data-lucide="arrow-right" class="icon-sm"></i>Xem xac nhan</button>
+        </div>
+    </section>
+
+    <section class="hidden space-y-6" data-step-panel="3">
+        <div class="surface-card fade-in-delay-2">
+            <div class="mb-5">
+                <h2 class="section-title !text-xl">Buoc 3: Xac nhan dat lich</h2>
+                <p class="section-subtitle">Kiem tra lai thong tin truoc khi tao lich hen.</p>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2">
+                <div class="summary-row">
+                    <span class="text-[var(--color-ink-500)]">Benh nhan</span>
+                    <span class="font-semibold text-[var(--color-ink-900)]" data-summary-patient>Chua chon</span>
+                </div>
+                <div class="summary-row">
+                    <span class="text-[var(--color-ink-500)]">Bac si</span>
+                    <span class="font-semibold text-[var(--color-ink-900)]" data-summary-doctor>Chua chon</span>
+                </div>
+                <div class="summary-row">
+                    <span class="text-[var(--color-ink-500)]">Ngay kham</span>
+                    <span class="font-semibold text-[var(--color-ink-900)]" data-summary-date>Chua chon</span>
+                </div>
+                <div class="summary-row">
+                    <span class="text-[var(--color-ink-500)]">Khung gio</span>
+                    <span class="font-semibold text-[var(--color-brand-700)]" data-summary-slot>Chua chon</span>
+                </div>
+                <div class="summary-row md:col-span-2">
+                    <span class="text-[var(--color-ink-500)]">Ly do</span>
+                    <span class="max-w-md text-right font-semibold text-[var(--color-ink-900)]" data-summary-reason>Chua nhap</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap justify-between gap-3">
+            <button type="button" class="btn-secondary" data-prev-step><i data-lucide="arrow-left" class="icon-sm"></i>Quay lai</button>
+            <button type="submit" class="booking-cta"><i data-lucide="badge-check" class="icon-sm"></i>Xac nhan dat lich</button>
+        </div>
+    </section>
+</form>
+
+{{ booked_slots|json_script:"booked-slots-data" }}
+<script>
+    const bookedSlots = JSON.parse(document.getElementById("booked-slots-data").textContent);
+    const doctorField = document.getElementById("id_doctor");
+    const dateField = document.getElementById("id_date");
+    const timeSlotField = document.getElementById("id_time_slot");
+    const patientField = document.getElementById("id_patient");
+    const slotButtons = Array.from(document.querySelectorAll("[data-slot-button]"));
+    const selectedSlotLabel = document.getElementById("selected-slot-label");
+    const panels = Array.from(document.querySelectorAll("[data-step-panel]"));
+    const stepChips = Array.from(document.querySelectorAll("[data-step-chip]"));
+    const progressBar = document.getElementById("progress-bar");
+    const progressLabel = document.getElementById("progress-label");
+    const nextButtons = Array.from(document.querySelectorAll("[data-next-step]"));
+    const prevButtons = Array.from(document.querySelectorAll("[data-prev-step]"));
+    const summaryTargets = {
+        patient: document.querySelector("[data-summary-patient]"),
+        doctor: document.querySelector("[data-summary-doctor]"),
+        date: document.querySelector("[data-summary-date]"),
+        slot: document.querySelector("[data-summary-slot]"),
+        reason: document.querySelector("[data-summary-reason]")
+    };
+    let currentStep = 1;
+
+    const optionLabel = (field) => field.options[field.selectedIndex] ? field.options[field.selectedIndex].text : "Chua chon";
+
+    const syncSlots = () => {
+        const doctorId = doctorField.value;
+        const selectedDate = dateField.value;
+        const disabledSlots = new Set(((bookedSlots[doctorId] || {})[selectedDate]) || []);
+        const currentValue = timeSlotField.value;
+
+        slotButtons.forEach((button) => {
+            const slot = button.dataset.slot;
+            const isDisabled = disabledSlots.has(slot);
+            button.disabled = isDisabled;
+            button.classList.toggle("slot-button-disabled", isDisabled);
+
+            const isActive = !isDisabled && currentValue === slot;
+            button.classList.toggle("slot-button-active", isActive);
+
+            if (isDisabled && currentValue === slot) {
+                timeSlotField.value = "";
+            }
+        });
+
+        selectedSlotLabel.textContent = timeSlotField.value || "Chua chon";
+    };
+
+    const updateSummary = () => {
+        summaryTargets.patient.textContent = optionLabel(patientField);
+        summaryTargets.doctor.textContent = optionLabel(doctorField);
+        summaryTargets.date.textContent = dateField.value || "Chua chon";
+        summaryTargets.slot.textContent = timeSlotField.value || "Chua chon";
+        summaryTargets.reason.textContent = document.getElementById("id_reason").value || "Chua nhap";
+    };
+
+    const renderStep = () => {
+        panels.forEach((panel) => {
+            panel.classList.toggle("hidden", Number(panel.dataset.stepPanel) !== currentStep);
+        });
+        stepChips.forEach((chip) => {
+            const stepNumber = Number(chip.dataset.stepNumber);
+            chip.classList.toggle("step-chip-active", stepNumber === currentStep);
+            chip.classList.toggle("step-chip-done", stepNumber < currentStep);
+        });
+        progressBar.style.width = `${(currentStep / 3) * 100}%`;
+        progressLabel.textContent = `Buoc ${currentStep}/3`;
+        if (currentStep === 3) {
+            updateSummary();
+        }
+    };
+
+    const validateStep = () => {
+        if (currentStep === 1) {
+            return patientField.value && doctorField.value;
+        }
+        if (currentStep === 2) {
+            return doctorField.value && dateField.value && timeSlotField.value;
+        }
+        return true;
+    };
+
+    slotButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            if (button.disabled) return;
+            timeSlotField.value = button.dataset.slot;
+            syncSlots();
+        });
+    });
+
+    nextButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            if (!validateStep()) {
+                alert("Vui long hoan thanh thong tin bat buoc truoc khi sang buoc tiep theo.");
+                return;
+            }
+            currentStep = Math.min(3, currentStep + 1);
+            renderStep();
+        });
+    });
+
+    prevButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            currentStep = Math.max(1, currentStep - 1);
+            renderStep();
+        });
+    });
+
+    doctorField.addEventListener("change", syncSlots);
+    dateField.addEventListener("change", syncSlots);
+    patientField.addEventListener("change", updateSummary);
+    doctorField.addEventListener("change", updateSummary);
+    dateField.addEventListener("change", updateSummary);
+    document.getElementById("id_reason").addEventListener("input", updateSummary);
+
+    if (!dateField.value) {
+        dateField.value = "{{ today }}";
+    }
+    syncSlots();
+    updateSummary();
+    renderStep();
+</script>
+{% endblock %}

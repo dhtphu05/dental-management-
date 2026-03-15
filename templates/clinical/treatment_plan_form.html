@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Cap nhat dieu tri{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl">
+    <div class="surface-card fade-in">
+        <h1 class="mb-3">Cap nhat lieu trinh cho {{ object.appointment.patient.full_name }}</h1>
+        <p class="section-subtitle mb-6">Lich hen: {{ object.appointment.date }} {{ object.appointment.time_slot|time:"H:i" }}</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {{ form.teeth }}
+            {{ form.tooth_states }}
+
+            <div class="mb-8">
+                <div class="mb-4 flex items-end justify-between gap-4">
+                    <div>
+                        <h2 class="section-title !text-xl">So do rang</h2>
+                        <p class="section-subtitle">32 rang chia thanh 4 cung ham. Nhap vao tung rang de mo modal cap nhat tinh trang.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs font-semibold">
+                        <span class="rounded-full bg-rose-50 px-3 py-2 text-rose-600">Sau rang</span>
+                        <span class="rounded-full bg-sky-50 px-3 py-2 text-sky-600">Da dieu tri</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-2 text-slate-500">Da nho</span>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 lg:grid-cols-2">
+                    {% for section in odontogram_sections %}
+                        <section class="rounded-[2rem] bg-slate-50/80 p-5">
+                            <div class="mb-4 flex items-center justify-between">
+                                <h3>{{ section.label }}</h3>
+                                <span class="badge-soft">{{ section.teeth|length }} rang</span>
+                            </div>
+                            <div class="grid grid-cols-4 gap-3">
+                                {% for tooth in section.teeth %}
+                                    <button
+                                        type="button"
+                                        class="tooth-tile"
+                                        data-tooth-button
+                                        data-tooth-id="{{ tooth.pk }}"
+                                        data-tooth-number="{{ tooth.tooth_number }}"
+                                    >
+                                        <svg viewBox="0 0 64 88" class="tooth-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17 8C10 13 8 22 10 32L14 49C15 55 19 60 24 64L28 77C29 81 35 81 36 77L40 64C45 60 49 55 50 49L54 32C56 22 54 13 47 8C42 5 36 7 32 12C28 7 22 5 17 8Z" fill="currentColor" class="text-white/95"/>
+                                            <path d="M17 8C10 13 8 22 10 32L14 49C15 55 19 60 24 64L28 77C29 81 35 81 36 77L40 64C45 60 49 55 50 49L54 32C56 22 54 13 47 8C42 5 36 7 32 12C28 7 22 5 17 8Z" stroke="currentColor" stroke-width="4" class="text-slate-200"/>
+                                        </svg>
+                                        <span class="tooth-number">{{ tooth.tooth_number }}</span>
+                                        <span class="tooth-status-pill bg-slate-100 text-slate-500" data-tooth-pill> {{ tooth.get_status_display }} </span>
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </section>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% for field in form %}
+                {% if field.name != "teeth" and field.name != "tooth_states" %}
+                    <div class="mb-5">
+                        <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">{{ field.label }}</label>
+                        {% if field.name == "services" %}
+                            <div class="checkbox-grid">
+                                {{ field }}
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                        {% if field.help_text %}<div class="mt-2 text-sm text-[var(--color-ink-500)]">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <button class="btn-primary" type="submit"><i data-lucide="save" class="icon-sm"></i>Luu lieu trinh</button>
+        </form>
+    </div>
+</div>
+
+<div id="tooth-modal" class="modal-shell">
+    <div class="modal-panel">
+        <div class="mb-5 flex items-start justify-between gap-4">
+            <div>
+                <p class="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-brand-700)]">Odontogram</p>
+                <h2 class="section-title !text-xl">Rang <span id="modal-tooth-number"></span></h2>
+                <p class="section-subtitle">Chon tinh trang cho rang dang duoc thao tac.</p>
+            </div>
+            <button type="button" class="btn-ghost" data-close-modal><i data-lucide="x" class="icon-sm"></i>Dong</button>
+        </div>
+
+        <div class="space-y-3">
+            {% for option in tooth_state_options %}
+                <button
+                    type="button"
+                    class="flex w-full items-center justify-between rounded-3xl bg-slate-50 px-4 py-4 text-left transition duration-200 hover:bg-[var(--color-brand-50)]"
+                    data-status-option
+                    data-status-value="{{ option.value }}"
+                >
+                    <span class="font-semibold text-[var(--color-ink-900)]">{{ option.label }}</span>
+                    <span class="text-sm text-[var(--color-ink-500)]">
+                        {% if option.value == "cavity" %}Mau do nhat{% elif option.value == "treated" %}Mau xanh nhat{% elif option.value == "missing" %}Mau xam{% else %}Trang thai mac dinh{% endif %}
+                    </span>
+                </button>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{{ tooth_states_data|json_script:"odontogram-states-data" }}
+<script>
+    const toothStatesField = document.getElementById("id_tooth_states");
+    const toothButtons = Array.from(document.querySelectorAll("[data-tooth-button]"));
+    const statusLabels = {
+        cavity: "Sau rang",
+        treated: "Da dieu tri",
+        missing: "Da nho",
+        normal: "Binh thuong"
+    };
+    const initialToothMeta = JSON.parse(document.getElementById("odontogram-states-data").textContent);
+    let toothStates = toothStatesField.value ? JSON.parse(toothStatesField.value) : Object.fromEntries(
+        Object.entries(initialToothMeta).map(([toothId, payload]) => [toothId, payload.status])
+    );
+    let activeToothId = null;
+
+    const modal = document.getElementById("tooth-modal");
+    const modalToothNumber = document.getElementById("modal-tooth-number");
+
+    const tileClasses = {
+        cavity: "tooth-tile-cavity",
+        treated: "tooth-tile-treated",
+        missing: "tooth-tile-missing",
+        normal: ""
+    };
+
+    const pillClasses = {
+        cavity: "bg-rose-100 text-rose-600",
+        treated: "bg-sky-100 text-sky-600",
+        missing: "bg-slate-200 text-slate-600",
+        normal: "bg-slate-100 text-slate-500"
+    };
+
+    const syncSelectedTeeth = () => {
+        document.querySelectorAll("input[name='teeth']").forEach((input) => input.remove());
+        const selectedIds = Object.entries(toothStates)
+            .filter(([, status]) => status !== "normal")
+            .map(([toothId]) => toothId);
+
+        selectedIds.forEach((toothId) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "teeth";
+            input.value = toothId;
+            toothStatesField.insertAdjacentElement("afterend", input);
+        });
+
+        toothStatesField.value = JSON.stringify(toothStates);
+    };
+
+    const applyToothVisual = (button) => {
+        const toothId = button.dataset.toothId;
+        const status = toothStates[toothId] || "normal";
+        button.classList.remove("tooth-tile-cavity", "tooth-tile-treated", "tooth-tile-missing");
+        if (tileClasses[status]) {
+            button.classList.add(tileClasses[status]);
+        }
+
+        const pill = button.querySelector("[data-tooth-pill]");
+        pill.className = "tooth-status-pill " + pillClasses[status];
+        pill.textContent = statusLabels[status];
+    };
+
+    const openModal = (toothId, toothNumber) => {
+        activeToothId = toothId;
+        modalToothNumber.textContent = toothNumber;
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    };
+
+    const closeModal = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        activeToothId = null;
+    };
+
+    toothButtons.forEach((button) => {
+        applyToothVisual(button);
+        button.addEventListener("click", () => openModal(button.dataset.toothId, button.dataset.toothNumber));
+    });
+
+    document.querySelectorAll("[data-status-option]").forEach((button) => {
+        button.addEventListener("click", () => {
+            if (!activeToothId) return;
+            toothStates[activeToothId] = button.dataset.statusValue;
+            const activeButton = document.querySelector(`[data-tooth-id="${activeToothId}"]`);
+            applyToothVisual(activeButton);
+            syncSelectedTeeth();
+            closeModal();
+        });
+    });
+
+    document.querySelector("[data-close-modal]").addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    syncSelectedTeeth();
+</script>
+{% endblock %}
