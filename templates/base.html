@@ -7,11 +7,37 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: "#E3F2FD",
+                            500: "#2196F3",
+                            700: "#1565C0",
+                        },
+                        porcelain: "#F8FAFC",
+                        ink: {
+                            900: "#0f172a",
+                            700: "#334155",
+                            500: "#64748b",
+                        },
+                    },
+                    boxShadow: {
+                        soft: "0 16px 40px rgba(21, 101, 192, 0.08)",
+                        "soft-hover": "0 22px 52px rgba(21, 101, 192, 0.12)",
+                    },
+                },
+            },
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     {% block extra_head %}{% endblock %}
-    <style type="text/tailwindcss">
-        @theme {
+    <style>
+        :root {
             --color-brand-50: #E3F2FD;
             --color-brand-500: #2196F3;
             --color-brand-700: #1565C0;
@@ -21,95 +47,615 @@
             --color-ink-500: #64748b;
             --shadow-soft: 0 16px 40px rgba(21, 101, 192, 0.08);
             --shadow-soft-hover: 0 22px 52px rgba(21, 101, 192, 0.12);
-            --radius-shell: 1.75rem;
         }
 
-        @layer base {
-            html { font-family: "Inter", sans-serif; }
-            body { @apply bg-[var(--color-porcelain)] text-[var(--color-ink-900)] antialiased; }
-            h1 { @apply text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--color-ink-900)]; }
-            h2 { @apply text-xl md:text-2xl font-bold tracking-tight text-[var(--color-ink-900)]; }
-            h3 { @apply text-lg font-semibold text-[var(--color-ink-900)]; }
-            p, li, td, th, label, input, select, textarea { @apply text-sm md:text-[0.95rem]; }
-            input, select, textarea {
-                @apply w-full rounded-2xl border-0 bg-white/90 px-4 py-3 text-[var(--color-ink-900)] shadow-[0_6px_20px_rgba(15,23,42,0.05)] outline-none ring-1 ring-slate-200/70 transition duration-200 placeholder:text-slate-400 focus:ring-2 focus:ring-[var(--color-brand-500)]/40;
-            }
-            input[type="checkbox"] {
-                @apply h-5 w-5 rounded-lg p-0 accent-[var(--color-brand-500)] shadow-none ring-0;
-            }
-            table { @apply w-full border-collapse; }
-            thead th { @apply px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ink-500)]; }
-            tbody td { @apply px-6 py-4 align-middle text-[var(--color-ink-700)]; }
+        html {
+            font-family: "Inter", sans-serif;
         }
 
-        @layer components {
-            .app-shell { @apply mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8; }
-            .topbar { @apply sticky top-4 z-20 mx-auto mb-8 flex max-w-7xl items-center justify-between rounded-[2rem] bg-white/80 px-5 py-4 shadow-[var(--shadow-soft)] backdrop-blur-xl; }
-            .nav-links { @apply hidden items-center gap-2 lg:flex; }
-            .nav-link { @apply inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium text-[var(--color-ink-700)] transition duration-200 hover:scale-[1.02] hover:bg-[var(--color-brand-50)] hover:text-[var(--color-brand-700)]; }
-            .brand-mark { @apply inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-linear-to-br from-[var(--color-brand-500)] to-[var(--color-brand-700)] text-lg font-black text-white shadow-[var(--shadow-soft)]; }
-            .hero-panel { @apply rounded-[2rem] bg-linear-to-br from-white via-[#fafdff] to-[var(--color-brand-50)] p-6 shadow-[var(--shadow-soft)] md:p-8; }
-            .surface-card { @apply rounded-[2rem] bg-white/92 p-6 shadow-[var(--shadow-soft)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft-hover)]; }
-            .surface-card-danger { @apply rounded-[2rem] bg-white p-6 shadow-[var(--shadow-soft)] ring-1 ring-rose-100; }
-            .metric-card { @apply rounded-3xl bg-white/95 p-5 shadow-[var(--shadow-soft)] transition duration-300 hover:scale-[1.02]; }
-            .btn-primary { @apply inline-flex items-center justify-center rounded-2xl bg-[var(--color-brand-500)] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(33,150,243,0.25)] transition duration-200 hover:scale-[1.03] hover:bg-[var(--color-brand-700)]; }
-            .btn-secondary { @apply inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[var(--color-brand-700)] shadow-[var(--shadow-soft)] ring-1 ring-slate-200/70 transition duration-200 hover:scale-[1.03] hover:bg-[var(--color-brand-50)]; }
-            .btn-danger { @apply inline-flex items-center justify-center rounded-2xl bg-rose-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(244,63,94,0.22)] transition duration-200 hover:scale-[1.03] hover:bg-rose-600; }
-            .btn-ghost { @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-semibold text-[var(--color-ink-700)] transition duration-200 hover:scale-[1.02] hover:bg-slate-100; }
-            .section-title { @apply mb-1 text-2xl font-bold tracking-tight text-[var(--color-ink-900)]; }
-            .section-subtitle { @apply text-sm text-[var(--color-ink-500)]; }
-            .table-shell { @apply overflow-hidden rounded-[2rem] bg-white shadow-[var(--shadow-soft)]; }
-            .table-row { @apply border-t border-slate-100/80 transition duration-200 hover:bg-[var(--color-brand-50)]/45; }
-            .badge-soft { @apply inline-flex items-center rounded-full bg-[var(--color-brand-50)] px-3 py-1 text-xs font-semibold text-[var(--color-brand-700)]; }
-            .fade-in { animation: fadeInUp .6s ease-out both; }
-            .fade-in-delay-1 { animation: fadeInUp .7s ease-out both; }
-            .fade-in-delay-2 { animation: fadeInUp .8s ease-out both; }
-            .checkbox-grid { @apply grid grid-cols-2 gap-3 md:grid-cols-4; }
-            .checkbox-grid label { @apply flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-medium text-[var(--color-ink-700)] transition duration-200 hover:bg-[var(--color-brand-50)]; }
-            .slot-button { @apply flex min-h-16 items-center justify-center rounded-3xl bg-white px-3 py-4 text-center text-sm font-semibold text-[var(--color-brand-700)] shadow-[var(--shadow-soft)] ring-1 ring-slate-200/70 transition duration-200 hover:scale-[1.03] hover:bg-[var(--color-brand-50)]; }
-            .slot-button-disabled { @apply cursor-not-allowed bg-slate-100 text-slate-400 shadow-none ring-1 ring-slate-200 opacity-70 hover:scale-100 hover:bg-slate-100; }
-            .slot-button-active { @apply bg-[var(--color-brand-500)] text-white ring-0 shadow-[0_18px_36px_rgba(33,150,243,0.3)] animate-pulse; }
-            .booking-cta { @apply inline-flex w-full items-center justify-center rounded-full bg-[var(--color-brand-700)] px-8 py-5 text-base font-bold text-white shadow-[0_20px_44px_rgba(21,101,192,0.34)] transition duration-200 hover:scale-[1.02] hover:bg-[var(--color-brand-500)]; }
-            .step-chip { @apply flex items-center gap-3 rounded-3xl bg-white/85 px-4 py-3 shadow-[var(--shadow-soft)] transition duration-200; }
-            .step-chip-active { @apply bg-[var(--color-brand-500)] text-white shadow-[0_16px_36px_rgba(33,150,243,0.28)]; }
-            .step-chip-done { @apply bg-[var(--color-brand-50)] text-[var(--color-brand-700)]; }
-            .progress-track { @apply h-2 overflow-hidden rounded-full bg-slate-200; }
-            .progress-bar { @apply h-full rounded-full bg-linear-to-r from-[var(--color-brand-500)] to-[var(--color-brand-700)] transition-all duration-300; }
-            .summary-row { @apply flex items-center justify-between rounded-3xl bg-slate-50 px-4 py-4; }
-            .tooth-tile { @apply group flex flex-col items-center gap-3 rounded-[1.75rem] bg-white px-3 py-4 shadow-[var(--shadow-soft)] ring-1 ring-slate-200/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-soft-hover)]; }
-            .tooth-tile-cavity { @apply bg-rose-50 ring-rose-200/80; }
-            .tooth-tile-treated { @apply bg-sky-50 ring-sky-200/90; }
-            .tooth-tile-missing { @apply bg-slate-100 ring-slate-300/80; }
-            .tooth-svg { @apply h-16 w-12 transition-transform duration-300 group-hover:scale-105; }
-            .tooth-number { @apply text-xs font-bold tracking-[0.14em] text-[var(--color-ink-500)]; }
-            .tooth-status-pill { @apply rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]; }
-            .modal-shell { @apply fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm; }
-            .modal-panel { @apply w-full max-w-md rounded-[2rem] bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.2)]; }
-            .icon-sm { @apply h-4 w-4; }
-            .icon-md { @apply h-5 w-5; }
-            .doctor-shell { @apply grid gap-6 lg:grid-cols-[auto_1fr]; }
-            .doctor-sidebar { @apply sticky top-6 flex h-fit flex-col gap-4 rounded-[2rem] bg-white p-4 shadow-[var(--shadow-soft)] transition-all duration-300; }
-            .doctor-sidebar-collapsed { @apply lg:w-24; }
-            .doctor-sidebar-expanded { @apply lg:w-72; }
-            .doctor-sidebar-link { @apply flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-ink-700)] transition duration-200 hover:bg-[var(--color-brand-50)] hover:text-[var(--color-brand-700)]; }
-            .doctor-sidebar-link-active { @apply bg-[var(--color-brand-50)] text-[var(--color-brand-700)]; }
-            .doctor-sidebar-text { @apply whitespace-nowrap; }
-            .doctor-main { @apply min-w-0 space-y-6; }
-            .doctor-stat-card { @apply rounded-[24px] bg-white p-5 shadow-[var(--shadow-soft)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft-hover)]; }
-            .doctor-stat-icon { @apply flex h-14 w-14 items-center justify-center rounded-[24px] bg-[var(--color-brand-50)] text-[var(--color-brand-700)]; }
-            .doctor-table { @apply w-full border-separate border-spacing-y-3; }
-            .doctor-table thead th { @apply px-5 py-2 text-left text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ink-500)]; }
-            .doctor-table tbody td { @apply bg-white px-5 py-4 text-[var(--color-ink-700)] transition duration-200; }
-            .doctor-table tbody tr:hover td { @apply bg-[var(--color-brand-50)]; }
-            .doctor-table tbody td:first-child { @apply rounded-l-[24px]; }
-            .doctor-table tbody td:last-child { @apply rounded-r-[24px]; }
-            .doctor-chart-card { @apply rounded-[2rem] bg-white p-6 shadow-[var(--shadow-soft)]; }
+        body {
+            background: var(--color-porcelain);
+            color: var(--color-ink-900);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1 {
+            font-size: clamp(1.9rem, 4vw, 2.5rem);
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--color-ink-900);
+        }
+
+        h2 {
+            font-size: clamp(1.4rem, 3vw, 1.75rem);
+            line-height: 1.2;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--color-ink-900);
+        }
+
+        h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-ink-900);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 0;
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 0.8rem 1rem;
+            color: var(--color-ink-900);
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+            outline: none;
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            transition: 0.2s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: rgba(33, 150, 243, 0.55);
+            box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.12);
+        }
+
+        input[type="checkbox"] {
+            width: 1.15rem;
+            height: 1.15rem;
+            accent-color: var(--color-brand-500);
+            box-shadow: none;
+        }
+
+        thead th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 0.74rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--color-ink-500);
+        }
+
+        tbody td {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+            color: var(--color-ink-700);
+        }
+
+        .app-shell {
+            width: min(100%, 80rem);
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+        }
+
+        .topbar,
+        .hero-panel,
+        .surface-card,
+        .surface-card-danger,
+        .table-shell,
+        .doctor-chart-card,
+        .doctor-stat-card,
+        .metric-card {
+            box-shadow: var(--shadow-soft);
+        }
+
+        .topbar {
+            position: sticky;
+            top: 1rem;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem 1.25rem;
+            border-radius: 2rem;
+            background: rgba(255, 255, 255, 0.86);
+            backdrop-filter: blur(18px);
+        }
+
+        .nav-links {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .nav-links {
+                display: flex;
+            }
+        }
+
+        .nav-link,
+        .btn-primary,
+        .btn-secondary,
+        .btn-danger,
+        .btn-ghost,
+        .booking-cta,
+        .doctor-sidebar-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        }
+
+        .nav-link {
+            padding: 0.65rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: var(--color-ink-700);
+        }
+
+        .nav-link:hover {
+            background: var(--color-brand-50);
+            color: var(--color-brand-700);
+            transform: scale(1.02);
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 1.5rem;
+            background: linear-gradient(135deg, var(--color-brand-500), var(--color-brand-700));
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 800;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .hero-panel {
+            border-radius: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #fbfdff 48%, var(--color-brand-50) 100%);
+        }
+
+        .surface-card,
+        .surface-card-danger,
+        .metric-card,
+        .doctor-chart-card {
+            border-radius: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+        }
+
+        .surface-card:hover,
+        .metric-card:hover,
+        .doctor-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft-hover);
+        }
+
+        .surface-card-danger {
+            border: 1px solid #ffe4e6;
+        }
+
+        .metric-card,
+        .doctor-stat-card {
+            border-radius: 24px;
+        }
+
+        .btn-primary {
+            border-radius: 1rem;
+            padding: 0.8rem 1.25rem;
+            background: var(--color-brand-500);
+            color: white;
+            font-size: 0.92rem;
+            font-weight: 600;
+            box-shadow: 0 12px 30px rgba(33, 150, 243, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-brand-700);
+            transform: scale(1.03);
+        }
+
+        .btn-secondary {
+            border-radius: 1rem;
+            padding: 0.8rem 1.25rem;
+            background: white;
+            color: var(--color-brand-700);
+            font-size: 0.92rem;
+            font-weight: 600;
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-brand-50);
+            transform: scale(1.03);
+        }
+
+        .btn-danger {
+            border-radius: 1rem;
+            padding: 0.8rem 1.25rem;
+            background: #f43f5e;
+            color: white;
+            font-size: 0.92rem;
+            font-weight: 600;
+            box-shadow: 0 12px 30px rgba(244, 63, 94, 0.22);
+        }
+
+        .btn-danger:hover {
+            background: #e11d48;
+            transform: scale(1.03);
+        }
+
+        .btn-ghost {
+            border-radius: 1rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--color-ink-700);
+        }
+
+        .btn-ghost:hover {
+            background: #f1f5f9;
+        }
+
+        .section-title {
+            margin-bottom: 0.25rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            color: var(--color-ink-500);
+            font-size: 0.95rem;
+        }
+
+        .table-shell {
+            overflow: hidden;
+            border-radius: 2rem;
+            background: white;
+        }
+
+        .table-row {
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+            transition: background-color 0.2s ease;
+        }
+
+        .table-row:hover {
+            background: rgba(227, 242, 253, 0.45);
+        }
+
+        .badge-soft {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            background: var(--color-brand-50);
+            color: var(--color-brand-700);
+            font-size: 0.74rem;
+            font-weight: 600;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 768px) {
+            .checkbox-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        .checkbox-grid label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: 1rem;
+            background: #f8fafc;
+            padding: 0.9rem 1rem;
+            color: var(--color-ink-700);
+            font-weight: 500;
+        }
+
+        .slot-button {
+            display: flex;
+            min-height: 4rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.5rem;
+            background: white;
+            padding: 1rem 0.75rem;
+            text-align: center;
+            color: var(--color-brand-700);
+            font-size: 0.92rem;
+            font-weight: 600;
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            box-shadow: var(--shadow-soft);
+            transition: 0.2s ease;
+        }
+
+        .slot-button:hover {
+            transform: scale(1.03);
+            background: var(--color-brand-50);
+        }
+
+        .slot-button-disabled {
+            cursor: not-allowed;
+            background: #f1f5f9;
+            color: #94a3b8;
+            opacity: 0.7;
+            box-shadow: none;
+        }
+
+        .slot-button-active {
+            background: var(--color-brand-500);
+            color: white;
+            border-color: var(--color-brand-500);
+            box-shadow: 0 18px 36px rgba(33, 150, 243, 0.3);
+            animation: pulseBlue 1.4s infinite;
+        }
+
+        .booking-cta {
+            width: 100%;
+            border-radius: 999px;
+            padding: 1.1rem 2rem;
+            background: var(--color-brand-700);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 0 20px 44px rgba(21, 101, 192, 0.34);
+        }
+
+        .booking-cta:hover {
+            background: var(--color-brand-500);
+            transform: scale(1.02);
+        }
+
+        .step-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border-radius: 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .step-chip-active {
+            background: var(--color-brand-500);
+            color: white;
+            box-shadow: 0 16px 36px rgba(33, 150, 243, 0.28);
+        }
+
+        .step-chip-done {
+            background: var(--color-brand-50);
+            color: var(--color-brand-700);
+        }
+
+        .progress-track {
+            height: 0.5rem;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--color-brand-500), var(--color-brand-700));
+            transition: width 0.3s ease;
+        }
+
+        .summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 1.5rem;
+            background: #f8fafc;
+            padding: 1rem;
+        }
+
+        .tooth-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: 1.75rem;
+            background: white;
+            padding: 1rem 0.75rem;
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .tooth-tile:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-soft-hover);
+        }
+
+        .tooth-tile-cavity {
+            background: #fff1f2;
+            border-color: #fecdd3;
+        }
+
+        .tooth-tile-treated {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+        }
+
+        .tooth-tile-missing {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .tooth-svg {
+            width: 3rem;
+            height: 4rem;
+            transition: transform 0.3s ease;
+        }
+
+        .tooth-tile:hover .tooth-svg {
+            transform: scale(1.05);
+        }
+
+        .tooth-number {
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            color: var(--color-ink-500);
+        }
+
+        .tooth-status-pill {
+            padding: 0.28rem 0.65rem;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .modal-shell {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.35);
+            backdrop-filter: blur(6px);
+        }
+
+        .modal-panel {
+            width: 100%;
+            max-width: 28rem;
+            border-radius: 2rem;
+            background: white;
+            padding: 1.5rem;
+            box-shadow: 0 24px 80px rgba(15, 23, 42, 0.2);
+        }
+
+        .icon-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .icon-md {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .doctor-shell {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .doctor-shell {
+                grid-template-columns: auto 1fr;
+            }
+        }
+
+        .doctor-sidebar {
+            position: sticky;
+            top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: fit-content;
+            padding: 1rem;
+            border-radius: 2rem;
+            background: white;
+            box-shadow: var(--shadow-soft);
+            transition: width 0.3s ease;
+        }
+
+        .doctor-sidebar-collapsed {
+            width: 6rem;
+        }
+
+        .doctor-sidebar-expanded {
+            width: 18rem;
+        }
+
+        .doctor-sidebar-link {
+            justify-content: flex-start;
+            padding: 0.85rem 1rem;
+            border-radius: 1rem;
+            color: var(--color-ink-700);
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        .doctor-sidebar-link:hover,
+        .doctor-sidebar-link-active {
+            background: var(--color-brand-50);
+            color: var(--color-brand-700);
+        }
+
+        .doctor-main {
+            min-width: 0;
+        }
+
+        .doctor-stat-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 24px;
+            background: var(--color-brand-50);
+            color: var(--color-brand-700);
+        }
+
+        .doctor-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.75rem;
+        }
+
+        .doctor-table thead th {
+            padding: 0.5rem 1.25rem;
+        }
+
+        .doctor-table tbody td {
+            background: white;
+            padding: 1rem 1.25rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .doctor-table tbody tr:hover td {
+            background: var(--color-brand-50);
+        }
+
+        .doctor-table tbody td:first-child {
+            border-radius: 24px 0 0 24px;
+        }
+
+        .doctor-table tbody td:last-child {
+            border-radius: 0 24px 24px 0;
         }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes pulseBlue {
+            0%, 100% { box-shadow: 0 18px 36px rgba(33, 150, 243, 0.22); }
+            50% { box-shadow: 0 22px 42px rgba(33, 150, 243, 0.38); }
+        }
+
+        .fade-in { animation: fadeInUp .6s ease-out both; }
+        .fade-in-delay-1 { animation: fadeInUp .7s ease-out both; }
+        .fade-in-delay-2 { animation: fadeInUp .8s ease-out both; }
     </style>
 </head>
 <body>
@@ -119,15 +665,15 @@
                 <span class="brand-mark">DN</span>
                 <span>
                     <span class="block text-base font-extrabold tracking-tight text-[var(--color-ink-900)]">Dental Project</span>
-                    <span class="block text-xs text-[var(--color-ink-500)]">Modern clinic interface</span>
+                    <span class="block text-xs text-[var(--color-ink-500)]">Nền tảng quản lý nha khoa hiện đại</span>
                 </span>
             </a>
             {% if request.user.is_authenticated and request.user.role != "patient" %}
                 <div class="nav-links">
-                    <a class="nav-link" href="{% url 'patient-list' %}"><i data-lucide="users" class="icon-sm"></i>Benh nhan</a>
-                    <a class="nav-link" href="{% url 'appointment-list' %}"><i data-lucide="calendar-days" class="icon-sm"></i>Lich hen</a>
-                    <a class="nav-link" href="{% url 'service-list' %}"><i data-lucide="stethoscope" class="icon-sm"></i>Dich vu</a>
-                    <a class="nav-link" href="{% url 'invoice-list' %}"><i data-lucide="receipt-text" class="icon-sm"></i>Hoa don</a>
+                    <a class="nav-link" href="{% url 'patient-list' %}"><i data-lucide="users" class="icon-sm"></i>Bệnh nhân</a>
+                    <a class="nav-link" href="{% url 'appointment-list' %}"><i data-lucide="calendar-days" class="icon-sm"></i>Lịch hẹn</a>
+                    <a class="nav-link" href="{% url 'service-list' %}"><i data-lucide="stethoscope" class="icon-sm"></i>Dịch vụ</a>
+                    <a class="nav-link" href="{% url 'invoice-list' %}"><i data-lucide="receipt-text" class="icon-sm"></i>Hóa đơn</a>
                     <a class="nav-link" href="{% url 'design-system' %}"><i data-lucide="swatch-book" class="icon-sm"></i>Design System</a>
                 </div>
             {% endif %}
@@ -136,8 +682,11 @@
                     <span class="hidden items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-[var(--color-ink-700)] md:inline-flex"><i data-lucide="user-round" class="icon-sm"></i>{{ request.user }}</span>
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
-                        <button class="btn-secondary !px-4 !py-2" type="submit"><i data-lucide="log-out" class="icon-sm"></i>Dang xuat</button>
+                        <button class="btn-secondary !px-4 !py-2" type="submit"><i data-lucide="log-out" class="icon-sm"></i>Đăng xuất</button>
                     </form>
+                {% else %}
+                    <a class="btn-primary !px-4 !py-2" href="{% url 'public-booking' %}"><i data-lucide="calendar-heart" class="icon-sm"></i>Đặt lịch hẹn</a>
+                    <a class="btn-secondary !px-4 !py-2" href="{% url 'login' %}"><i data-lucide="log-in" class="icon-sm"></i>Đăng nhập</a>
                 {% endif %}
             </div>
         </nav>

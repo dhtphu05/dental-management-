@@ -6,9 +6,15 @@ from apps.scheduling.views import (
     AppointmentDetailView,
     AppointmentListView,
     AppointmentUpdateView,
+    BookingAccountCreateView,
+    BookingSuccessView,
+    PublicBookingView,
 )
 
 urlpatterns = [
+    path("booking/", PublicBookingView.as_view(), name="public-booking"),
+    path("booking/success/", BookingSuccessView.as_view(), name="booking-success"),
+    path("booking/create-account/", BookingAccountCreateView.as_view(), name="booking-create-account"),
     path("", AppointmentListView.as_view(), name="appointment-list"),
     path("create/", AppointmentCreateView.as_view(), name="appointment-create"),
     path("<int:pk>/", AppointmentDetailView.as_view(), name="appointment-detail"),

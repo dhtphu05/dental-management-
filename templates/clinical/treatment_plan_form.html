@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Cap nhat dieu tri{% endblock %}
+{% block title %}Cập nhật điều trị{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-5xl">
     <div class="surface-card fade-in">
-        <h1 class="mb-3">Cap nhat lieu trinh cho {{ object.appointment.patient.full_name }}</h1>
-        <p class="section-subtitle mb-6">Lich hen: {{ object.appointment.date }} {{ object.appointment.time_slot|time:"H:i" }}</p>
+        <h1 class="mb-3">Cập nhật liệu trình cho {{ object.appointment.patient.full_name }}</h1>
+        <p class="section-subtitle mb-6">Lịch hẹn: {{ object.appointment.date }} {{ object.appointment.time_slot|time:"H:i" }}</p>
         <form method="post">
             {% csrf_token %}
             {{ form.non_field_errors }}
@@ -16,13 +16,13 @@
             <div class="mb-8">
                 <div class="mb-4 flex items-end justify-between gap-4">
                     <div>
-                        <h2 class="section-title !text-xl">So do rang</h2>
-                        <p class="section-subtitle">32 rang chia thanh 4 cung ham. Nhap vao tung rang de mo modal cap nhat tinh trang.</p>
+                        <h2 class="section-title !text-xl">Sơ đồ răng</h2>
+                        <p class="section-subtitle">32 răng chia thành 4 cung hàm. Nhấp vào từng răng để mở cửa sổ cập nhật tình trạng.</p>
                     </div>
                     <div class="flex flex-wrap gap-2 text-xs font-semibold">
-                        <span class="rounded-full bg-rose-50 px-3 py-2 text-rose-600">Sau rang</span>
-                        <span class="rounded-full bg-sky-50 px-3 py-2 text-sky-600">Da dieu tri</span>
-                        <span class="rounded-full bg-slate-100 px-3 py-2 text-slate-500">Da nho</span>
+                        <span class="rounded-full bg-rose-50 px-3 py-2 text-rose-600">Sâu răng</span>
+                        <span class="rounded-full bg-sky-50 px-3 py-2 text-sky-600">Đã điều trị</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-2 text-slate-500">Đã nhổ</span>
                     </div>
                 </div>
 
@@ -31,7 +31,7 @@
                         <section class="rounded-[2rem] bg-slate-50/80 p-5">
                             <div class="mb-4 flex items-center justify-between">
                                 <h3>{{ section.label }}</h3>
-                                <span class="badge-soft">{{ section.teeth|length }} rang</span>
+                                <span class="badge-soft">{{ section.teeth|length }} răng</span>
                             </div>
                             <div class="grid grid-cols-4 gap-3">
                                 {% for tooth in section.teeth %}
@@ -72,7 +72,7 @@
                     </div>
                 {% endif %}
             {% endfor %}
-            <button class="btn-primary" type="submit"><i data-lucide="save" class="icon-sm"></i>Luu lieu trinh</button>
+            <button class="btn-primary" type="submit"><i data-lucide="save" class="icon-sm"></i>Lưu liệu trình</button>
         </form>
     </div>
 </div>
@@ -82,10 +82,10 @@
         <div class="mb-5 flex items-start justify-between gap-4">
             <div>
                 <p class="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-brand-700)]">Odontogram</p>
-                <h2 class="section-title !text-xl">Rang <span id="modal-tooth-number"></span></h2>
-                <p class="section-subtitle">Chon tinh trang cho rang dang duoc thao tac.</p>
+                <h2 class="section-title !text-xl">Răng <span id="modal-tooth-number"></span></h2>
+                <p class="section-subtitle">Chọn tình trạng cho răng đang được thao tác.</p>
             </div>
-            <button type="button" class="btn-ghost" data-close-modal><i data-lucide="x" class="icon-sm"></i>Dong</button>
+            <button type="button" class="btn-ghost" data-close-modal><i data-lucide="x" class="icon-sm"></i>Đóng</button>
         </div>
 
         <div class="space-y-3">
@@ -98,7 +98,7 @@
                 >
                     <span class="font-semibold text-[var(--color-ink-900)]">{{ option.label }}</span>
                     <span class="text-sm text-[var(--color-ink-500)]">
-                        {% if option.value == "cavity" %}Mau do nhat{% elif option.value == "treated" %}Mau xanh nhat{% elif option.value == "missing" %}Mau xam{% else %}Trang thai mac dinh{% endif %}
+                        {% if option.value == "cavity" %}Màu đỏ nhạt{% elif option.value == "treated" %}Màu xanh nhạt{% elif option.value == "missing" %}Màu xám{% else %}Trạng thái mặc định{% endif %}
                     </span>
                 </button>
             {% endfor %}
@@ -111,10 +111,10 @@
     const toothStatesField = document.getElementById("id_tooth_states");
     const toothButtons = Array.from(document.querySelectorAll("[data-tooth-button]"));
     const statusLabels = {
-        cavity: "Sau rang",
-        treated: "Da dieu tri",
-        missing: "Da nho",
-        normal: "Binh thuong"
+        cavity: "Sâu răng",
+        treated: "Đã điều trị",
+        missing: "Đã nhổ",
+        normal: "Bình thường"
     };
     const initialToothMeta = JSON.parse(document.getElementById("odontogram-states-data").textContent);
     let toothStates = toothStatesField.value ? JSON.parse(toothStatesField.value) : Object.fromEntries(

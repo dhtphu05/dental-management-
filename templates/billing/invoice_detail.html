@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Chi tiet hoa don{% endblock %}
+{% block title %}Chi tiết hóa đơn{% endblock %}
 
 {% block content %}
 <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
     <div>
-        <h1 class="mb-2">Hoa don #{{ invoice.pk }}</h1>
+        <h1 class="mb-2">Hóa đơn #{{ invoice.pk }}</h1>
         <p class="section-subtitle">{{ invoice.treatment_plan.appointment.patient.full_name }}</p>
     </div>
-    <a class="btn-secondary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sua</a>
+    <a class="btn-secondary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>
 </div>
 <div class="surface-card fade-in">
-    <p><strong>Bac si:</strong> {{ invoice.treatment_plan.appointment.doctor.get_full_name|default:invoice.treatment_plan.appointment.doctor.username }}</p>
-    <p><strong>Ngay phat hanh:</strong> {{ invoice.issued_at }}</p>
-    <p><strong>Trang thai:</strong> {{ invoice.get_status_display }}</p>
-    <p><strong>Tong tien:</strong> {{ invoice.total_amount }}</p>
+    <p><strong>Bác sĩ:</strong> {{ invoice.treatment_plan.appointment.doctor.get_full_name|default:invoice.treatment_plan.appointment.doctor.username }}</p>
+    <p><strong>Ngày phát hành:</strong> {{ invoice.issued_at }}</p>
+    <p><strong>Trạng thái:</strong> {{ invoice.get_status_display }}</p>
+    <p><strong>Tổng tiền:</strong> {{ invoice.total_amount }}</p>
 </div>
 {% endblock %}

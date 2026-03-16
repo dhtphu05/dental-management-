@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Hoa don{% endblock %}
+{% block title %}Hóa đơn{% endblock %}
 
 {% block content %}
 <div class="mb-6">
-    <h1 class="mb-2">Hoa don</h1>
-    <p class="section-subtitle">Theo doi phat hanh, thanh toan va tong gia tri dieu tri.</p>
+    <h1 class="mb-2">Hóa đơn</h1>
+    <p class="section-subtitle">Theo dõi phát hành, thanh toán và tổng giá trị điều trị.</p>
 </div>
 <div class="table-shell fade-in">
     <div class="overflow-x-auto">
         <table>
             <thead>
                 <tr>
-                    <th>Benh nhan</th>
-                    <th>Bac si</th>
-                    <th>Tong tien</th>
-                    <th>Trang thai</th>
+                    <th>Bệnh nhân</th>
+                    <th>Bác sĩ</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
                     <th></th>
                 </tr>
             </thead>
@@ -27,12 +27,12 @@
                         <td>{{ invoice.total_amount }}</td>
                         <td>{{ invoice.get_status_display }}</td>
                         <td class="text-right">
-                            <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sua</a>
-                            <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'invoice-delete' invoice.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xoa</a>
+                            <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>
+                            <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'invoice-delete' invoice.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xóa</a>
                         </td>
                     </tr>
                 {% empty %}
-                    <tr class="table-row"><td colspan="5" class="text-[var(--color-ink-500)]">Chua co hoa don.</td></tr>
+                    <tr class="table-row"><td colspan="5" class="text-[var(--color-ink-500)]">Chưa có hóa đơn.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

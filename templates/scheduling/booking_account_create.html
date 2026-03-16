@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Tạo tài khoản bệnh nhân{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl">
+    <div class="surface-card fade-in">
+        <div class="mb-6">
+            <span class="badge-soft mb-3">Tạo tài khoản</span>
+            <h1 class="mb-2">Hoàn tất tài khoản bệnh nhân</h1>
+            <p class="section-subtitle">Bạn đã đặt lịch thành công. Bây giờ hãy tạo mật khẩu để dùng số điện thoại đăng nhập và theo dõi lịch khám.</p>
+        </div>
+
+        <div class="mb-6 grid gap-4 md:grid-cols-2">
+            <div class="summary-row"><span class="text-ink-500">Bác sĩ</span><span class="font-semibold text-ink-900">{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</span></div>
+            <div class="summary-row"><span class="text-ink-500">Lịch hẹn</span><span class="font-semibold text-brand-700">{{ appointment.date }} - {{ appointment.time_slot|time:"H:i" }}</span></div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="grid gap-5">
+                {% for field in form %}
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-ink-700">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-8 flex flex-wrap gap-3">
+                <button class="btn-primary" type="submit"><i data-lucide="shield-check" class="icon-sm"></i>Tạo tài khoản</button>
+                <a class="btn-secondary" href="{% url 'booking-success' %}"><i data-lucide="arrow-left" class="icon-sm"></i>Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

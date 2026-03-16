@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Chi tiet benh nhan{% endblock %}
+{% block title %}Chi tiết bệnh nhân{% endblock %}
 
 {% block content %}
 <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -9,24 +9,24 @@
         <p class="section-subtitle">{{ patient.phone }}</p>
     </div>
     <div class="flex flex-wrap gap-3">
-        <a class="btn-secondary" href="{% url 'patient-update' patient.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sua</a>
-        <a class="btn-primary" href="{% url 'appointment-create' %}?patient={{ patient.pk }}"><i data-lucide="calendar-plus-2" class="icon-sm"></i>Dat lich</a>
+        <a class="btn-secondary" href="{% url 'patient-update' patient.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>
+        <a class="btn-primary" href="{% url 'appointment-create' %}?patient={{ patient.pk }}"><i data-lucide="calendar-plus-2" class="icon-sm"></i>Đặt lịch</a>
     </div>
 </div>
 <div class="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
     <div class="surface-card fade-in">
-        <h2 class="section-title !text-xl">Thong tin</h2>
+        <h2 class="section-title !text-xl">Thông tin</h2>
         <div class="mt-4 space-y-4 text-[var(--color-ink-700)]">
             <p><strong>Email:</strong> {{ patient.email|default:"-" }}</p>
-            <p><strong>Ngay sinh:</strong> {{ patient.date_of_birth|default:"-" }}</p>
-            <p><strong>Dia chi:</strong> {{ patient.address|default:"-" }}</p>
-            <p><strong>Tien su:</strong> {{ patient.medical_history|default:"-" }}</p>
-            <p><strong>Ghi chu:</strong> {{ patient.notes|default:"-" }}</p>
+            <p><strong>Ngày sinh:</strong> {{ patient.date_of_birth|default:"-" }}</p>
+            <p><strong>Địa chỉ:</strong> {{ patient.address|default:"-" }}</p>
+            <p><strong>Tiền sử:</strong> {{ patient.medical_history|default:"-" }}</p>
+            <p><strong>Ghi chú:</strong> {{ patient.notes|default:"-" }}</p>
         </div>
     </div>
 
     <div class="surface-card fade-in-delay-1">
-        <h2 class="section-title !text-xl">Lich hen</h2>
+        <h2 class="section-title !text-xl">Lịch hẹn</h2>
         <ul class="mt-4 space-y-3">
                     {% for appointment in patient.appointments.all %}
                         <li class="flex items-center justify-between rounded-3xl bg-slate-50 px-4 py-4">
@@ -34,7 +34,7 @@
                             <a class="btn-ghost" href="{% url 'appointment-detail' appointment.pk %}"><i data-lucide="eye" class="icon-sm"></i>Xem</a>
                         </li>
                     {% empty %}
-                        <li class="rounded-3xl bg-slate-50 px-4 py-4 text-[var(--color-ink-500)]">Chua co lich hen.</li>
+                        <li class="rounded-3xl bg-slate-50 px-4 py-4 text-[var(--color-ink-500)]">Chưa có lịch hẹn.</li>
                     {% endfor %}
         </ul>
     </div>

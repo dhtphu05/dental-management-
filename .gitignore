@@ -10,3 +10,5 @@ htmlcov/
 staticfiles/
 media/
 *.log
+.env.local
+.pgdata/

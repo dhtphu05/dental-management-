@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Dang nhap{% endblock %}
+{% block title %}Đăng nhập{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-md">
     <div class="hero-panel fade-in">
         <div class="mb-6">
-            <span class="badge-soft mb-3">Secure Access</span>
-            <h1 class="mb-2">Dang nhap</h1>
-            <p class="section-subtitle">Truy cap he thong dieu hanh phong kham voi giao dien moi.</p>
+            <span class="badge-soft mb-3">Tài khoản bệnh nhân</span>
+            <h1 class="mb-2">Đăng nhập</h1>
+            <p class="section-subtitle">Đăng nhập bằng số điện thoại và mật khẩu để theo dõi lịch hẹn và hồ sơ khám.</p>
         </div>
                 <form method="post">
                     {% csrf_token %}
                     <div class="space-y-4">
                         {{ form.as_p }}
                     </div>
-                    <button class="btn-primary mt-5 w-full" type="submit"><i data-lucide="log-in" class="icon-sm"></i>Dang nhap</button>
+                    <button class="btn-primary mt-5 w-full" type="submit"><i data-lucide="log-in" class="icon-sm"></i>Đăng nhập</button>
                 </form>
     </div>
 </div>

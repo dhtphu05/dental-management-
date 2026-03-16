@@ -1,145 +1,182 @@
 # Dental Project
 
-He thong quan ly phong kham nha khoa duoc xay dung bang Django 6 theo kien truc module, gom cac phan he quan ly nguoi dung, benh nhan, lich hen, dieu tri rang va hoa don.
+A modular dental clinic management system built with Django 6. The project covers user management, patient records, appointment scheduling, clinical treatment workflows, billing, and a modern Tailwind-based UI.
 
-## Tinh nang chinh
+## Features
 
-- Custom User model voi role: `Admin`, `Doctor`, `Receptionist`, `Patient`
-- CRUD day du cho:
-  - Benh nhan
-  - Lich hen
-  - Dich vu
-  - Hoa don
-- Booking page da nang cap:
-  - Multi-step booking flow
-  - Time slots disable theo lich da dat
-  - Mobile-first grid cho khung gio
+- Custom user model with roles:
+  - `Admin`
+  - `Doctor`
+  - `Receptionist`
+  - `Patient`
+- Full CRUD for:
+  - Patients
+  - Appointments
+  - Services
+  - Invoices
+- Multi-step booking experience:
+  - Progress bar
+  - Doctor/day-based time slot availability
+  - Mobile-first time slot grid
 - Doctor dashboard:
   - Collapsible sidebar
   - Stats cards
-  - Bang lich hen hien dai
-  - Line chart bang Chart.js
-- Odontogram cho bac si:
-  - 32 rang chia 4 cung ham
-  - Modal cap nhat tinh trang rang
-  - Color coding cho tinh trang rang
-- Tu dong hoa nghiep vu:
-  - Chan trung lich bac si
-  - Tu dong tao odontogram cho benh nhan moi
-  - Tu dong cap nhat trang thai rang khi hoan tat lieu trinh
-  - Tu dong sinh va tinh tong hoa don tu treatment plan
-- Design System dung Tailwind CSS + Lucide Icons
+  - Modern appointments table
+  - Line chart powered by Chart.js
+- Interactive odontogram for doctors:
+  - 32 teeth displayed in 4 quadrants
+  - Tooth status modal
+  - Color-coded tooth states
+- Automated business rules:
+  - Prevents doctor schedule conflicts
+  - Auto-creates a default odontogram for new patients
+  - Updates tooth status when treatment is completed
+  - Auto-generates invoice totals from selected services
+- Design system built with Tailwind CSS
+- Lucide Icons used across the project UI
 
-## Cau truc du an
+## Project Structure
 
 ```text
 .
 ├── core/                 # Django settings, urls, wsgi, asgi
 ├── apps/
-│   ├── accounts/         # User, role, dashboard
-│   ├── patients/         # Ho so benh nhan
-│   ├── scheduling/       # Lich hen va booking flow
-│   ├── clinical/         # Odontogram, treatment plan, services
-│   └── billing/          # Hoa don
-├── templates/            # Giao dien HTML
-├── static/               # Tai nguyen static
+│   ├── accounts/         # Users, roles, dashboards
+│   ├── patients/         # Patient records
+│   ├── scheduling/       # Appointments and booking flow
+│   ├── clinical/         # Odontogram, treatment plans, services
+│   └── billing/          # Invoices
+├── templates/            # HTML templates
+├── static/               # Static assets
 ├── manage.py
 └── README.md
 ```
 
-## Cong nghe
+## Tech Stack
 
 - Python 3.14
 - Django 6.0.3
-- SQLite
+- PostgreSQL
 - Tailwind CSS Browser CDN
 - Chart.js
 - Lucide Icons
 
-## Cai dat va chay local
+## Local Setup
 
-### 1. Tao virtualenv
+### 1. Create a virtual environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 2. Cai dependency
+### 2. Install dependencies
 
 ```bash
-pip install "Django>=6,<6.1"
+pip install -r requirements.txt
 ```
 
-### 3. Chay migrate
+### 3. Start PostgreSQL with Docker
+
+This project includes a local PostgreSQL setup via Docker Compose.
+
+```bash
+docker compose up -d
+```
+
+The default local database settings are stored in `.env.local`:
+
+```bash
+POSTGRES_DB=dental_project
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_HOST=127.0.0.1
+POSTGRES_PORT=5433
+```
+
+Django loads `.env.local` automatically at startup.
+
+### 4. Apply migrations
 
 ```bash
 python manage.py migrate
 ```
 
-### 4. Tao tai khoan admin
+### 5. Create an admin user
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### 5. Chay server
+### 6. Run the development server
 
 ```bash
 python manage.py runserver
 ```
 
-Truy cap:
+Open:
 
-- Dashboard: `http://127.0.0.1:8000/`
+- App: `http://127.0.0.1:8000/`
 - Admin: `http://127.0.0.1:8000/admin/`
 
-## Chay test
+## Running Tests
 
 ```bash
 python manage.py test
 ```
 
-## Business Logic quan trong
+## Core Business Logic
 
-### Appointment validation
+### Appointment Validation
 
-- Mot bac si khong the co 2 lich hen trung ngay va gio
-- Kiem tra duoc thuc hien o model `Appointment`
+- A doctor cannot have two appointments at the same date and time
+- Validation is enforced in the `Appointment` model
 
-### Odontogram automation
+### Odontogram Automation
 
-- Khi tao benh nhan moi, he thong tu dong tao 32 rang mac dinh
-- Khi treatment plan hoan tat, trang thai rang lien quan duoc cap nhat
+- A newly created patient automatically gets a full 32-tooth odontogram
+- Completing a treatment plan updates the related tooth statuses
 
-### Invoice automation
+### Invoice Automation
 
-- Hoa don duoc tao tu dong theo treatment plan
-- Tong tien duoc tinh tu cac service da chon
+- Invoices are created from treatment plans
+- Invoice totals are calculated from the selected services
 
-## Giao dien noi bat
+## UI Highlights
 
-- Doctor dashboard voi sidebar thu gon
-- Booking page multi-step co thanh tien trinh
-- Odontogram tuong tac voi modal cap nhat tinh trang rang
-- CRUD pages dong nhat theo design system xanh nha khoa
+- Doctor dashboard with collapsible sidebar
+- Multi-step booking page with progress tracking
+- Interactive odontogram with modal-based tooth state editing
+- Consistent CRUD pages built on the project design system
 
-## Git workflow goi y
+## Git Setup
+
+The repository has been initialized locally.
+
+Suggested first commit:
 
 ```bash
-git init
 git add .
 git commit -m "Initial commit"
 ```
 
-Neu muon lam viec theo nhanh rieng:
+Current default branch:
+
+```bash
+main
+```
+
+If you want to work on a separate branch:
 
 ```bash
 git checkout -b codex/setup-project
 ```
 
-## Luu y
+## Notes
 
-- File `db.sqlite3` da duoc dua vao `.gitignore`
-- Thu muc `.venv/` va cac file cache Python cung da duoc bo qua
-- Project hien dang toi uu cho phat trien local
+- PostgreSQL is now the default database backend
+- `db.sqlite3` is still ignored in `.gitignore` but is no longer used by default
+- Docker stores PostgreSQL data in `.pgdata/`
+- `.venv/` and Python cache files are ignored
+- The current setup is optimized for local development
+- Tailwind CSS, Lucide Icons, and Chart.js are loaded via CDN, so an internet connection is required for full UI rendering

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Đặt lịch thành công{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl space-y-6">
+    <section class="hero-panel fade-in">
+        <span class="badge-soft mb-4">Đặt lịch thành công</span>
+        <h1 class="mb-3">Lịch hẹn của bạn đã được ghi nhận</h1>
+        <p class="section-subtitle">Chúng tôi đã lưu thông tin lịch khám. Bước tiếp theo là tạo tài khoản để bạn dễ theo dõi lịch hẹn và hồ sơ khám trong những lần sau.</p>
+    </section>
+
+    <section class="surface-card fade-in-delay-1">
+        <h2 class="section-title !text-xl">Thông tin lịch hẹn</h2>
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+            <div class="summary-row"><span class="text-ink-500">Bệnh nhân</span><span class="font-semibold text-ink-900">{{ appointment.patient.full_name }}</span></div>
+            <div class="summary-row"><span class="text-ink-500">Số điện thoại</span><span class="font-semibold text-ink-900">{{ appointment.patient.phone }}</span></div>
+            <div class="summary-row"><span class="text-ink-500">Bác sĩ</span><span class="font-semibold text-ink-900">{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</span></div>
+            <div class="summary-row"><span class="text-ink-500">Ngày giờ</span><span class="font-semibold text-brand-700">{{ appointment.date }} - {{ appointment.time_slot|time:"H:i" }}</span></div>
+        </div>
+    </section>
+
+    <section class="surface-card fade-in-delay-2">
+        {% if can_create_account %}
+            <h2 class="section-title !text-xl">Hãy tạo tài khoản để theo dõi lịch khám</h2>
+            <p class="section-subtitle mb-5">Tài khoản bệnh nhân giúp bạn xem lại lịch hẹn, lịch sử khám và các cập nhật liên quan về sau.</p>
+            <div class="flex flex-wrap gap-3">
+                <a class="btn-primary" href="{% url 'booking-create-account' %}"><i data-lucide="user-plus" class="icon-sm"></i>Tạo tài khoản ngay</a>
+                <a class="btn-secondary" href="{% url 'public-booking' %}"><i data-lucide="calendar-plus-2" class="icon-sm"></i>Đặt thêm lịch khác</a>
+            </div>
+        {% else %}
+            <h2 class="section-title !text-xl">Số điện thoại này đã có tài khoản</h2>
+            <p class="section-subtitle mb-5">Bạn có thể đăng nhập ngay để theo dõi lịch hẹn vừa đặt.</p>
+            <div class="flex flex-wrap gap-3">
+                <a class="btn-primary" href="{% url 'login' %}"><i data-lucide="log-in" class="icon-sm"></i>Đăng nhập</a>
+                <a class="btn-secondary" href="{% url 'public-booking' %}"><i data-lucide="calendar-plus-2" class="icon-sm"></i>Đặt thêm lịch khác</a>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
