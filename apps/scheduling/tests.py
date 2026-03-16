@@ -5,6 +5,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.accounts.models import CustomUser, UserRole
+from apps.billing.models import Invoice
+from apps.clinical.models import Service, Tooth, ToothStatus, TreatmentPlan, TreatmentPlanStatus
 from apps.patients.models import Patient
 from apps.scheduling.models import Appointment, AppointmentStatus
 
@@ -107,3 +109,73 @@ class PublicBookingFlowTests(TestCase):
         patient = Patient.objects.get(phone="0900555666")
         self.assertIsNotNone(patient.user)
         self.assertEqual(patient.user.phone, "0900555666")
+
+
+class AppointmentDetailViewTests(TestCase):
+    def setUp(self):
+        self.receptionist = CustomUser.objects.create_user(
+            username="reception-detail",
+            password="secret123",
+            phone="0900111333",
+            role=UserRole.RECEPTIONIST,
+        )
+        self.doctor = CustomUser.objects.create_user(
+            username="doctor-detail",
+            password="secret123",
+            phone="0900111444",
+            role=UserRole.DOCTOR,
+        )
+        self.patient = Patient.objects.create(full_name="Detail Patient", phone="0900111555")
+        self.service = Service.objects.create(
+            name="Điều trị tủy",
+            price="2200000.00",
+            estimated_duration="01:30:00",
+        )
+
+    def test_internal_appointment_detail_renders_treatment_and_invoice(self):
+        appointment = Appointment.objects.create(
+            patient=self.patient,
+            doctor=self.doctor,
+            date=date(2026, 3, 26),
+            time_slot=time(9, 30),
+            status=AppointmentStatus.COMPLETED,
+        )
+        tooth = Tooth.objects.get(patient=self.patient, tooth_number=26)
+        tooth.status = ToothStatus.CAVITY
+        tooth.save(update_fields=["status", "updated_at"])
+        plan = TreatmentPlan.objects.create(
+            appointment=appointment,
+            diagnosis="Viêm tủy răng 26",
+            notes="Đã xử lý và hẹn tái khám.",
+            status=TreatmentPlanStatus.COMPLETED,
+            resulting_tooth_status=ToothStatus.TREATED,
+        )
+        plan.services.add(self.service)
+        plan.teeth.add(tooth)
+        invoice = Invoice.objects.get(treatment_plan=plan)
+
+        self.client.login(username="reception-detail", password="secret123")
+        response = self.client.get(reverse("appointment-detail", args=[appointment.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hồ sơ điều trị")
+        self.assertContains(response, "Viêm tủy răng 26")
+        self.assertContains(response, "Điều trị tủy")
+        self.assertContains(response, f"Răng {tooth.tooth_number}")
+        self.assertContains(response, f"#{invoice.pk}")
+
+    def test_internal_appointment_detail_handles_missing_treatment_and_invoice(self):
+        appointment = Appointment.objects.create(
+            patient=self.patient,
+            doctor=self.doctor,
+            date=date(2026, 3, 27),
+            time_slot=time(14, 0),
+            status=AppointmentStatus.COMPLETED,
+        )
+
+        self.client.login(username="reception-detail", password="secret123")
+        response = self.client.get(reverse("appointment-detail", args=[appointment.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Chưa có dữ liệu điều trị cho lịch hẹn này.")
+        self.assertContains(response, "Chưa có dữ liệu hóa đơn cho lịch hẹn này.")

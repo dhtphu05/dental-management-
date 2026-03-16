@@ -27,7 +27,7 @@ class ServiceCreateView(ServiceAccessMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Them dich vu"
+        context["page_title"] = "Thêm dịch vụ"
         return context
 
 
@@ -39,7 +39,7 @@ class ServiceUpdateView(ServiceAccessMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Cap nhat dich vu"
+        context["page_title"] = "Cập nhật dịch vụ"
         return context
 
 
@@ -50,7 +50,7 @@ class ServiceDeleteView(ServiceAccessMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Xoa dich vu"
+        context["page_title"] = "Xóa dịch vụ"
         return context
 
 
@@ -68,7 +68,7 @@ class DoctorTreatmentPlanUpdateView(RoleRequiredMixin, UpdateView):
         )
         treatment_plan, _ = TreatmentPlan.objects.get_or_create(
             appointment=appointment,
-            defaults={"diagnosis": "Chua co chan doan."},
+            defaults={"diagnosis": "Chưa có chẩn đoán."},
         )
         return treatment_plan
 
@@ -79,16 +79,16 @@ class DoctorTreatmentPlanUpdateView(RoleRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         teeth = list(self.object.appointment.patient.teeth.order_by("tooth_number"))
         context["odontogram_sections"] = [
-            {"label": "Cung ham tren phai", "teeth": [tooth for tooth in teeth if 11 <= tooth.tooth_number <= 18]},
-            {"label": "Cung ham tren trai", "teeth": [tooth for tooth in teeth if 21 <= tooth.tooth_number <= 28]},
-            {"label": "Cung ham duoi trai", "teeth": [tooth for tooth in teeth if 31 <= tooth.tooth_number <= 38]},
-            {"label": "Cung ham duoi phai", "teeth": [tooth for tooth in teeth if 41 <= tooth.tooth_number <= 48]},
+            {"label": "Cung hàm trên phải", "teeth": [tooth for tooth in teeth if 11 <= tooth.tooth_number <= 18]},
+            {"label": "Cung hàm trên trái", "teeth": [tooth for tooth in teeth if 21 <= tooth.tooth_number <= 28]},
+            {"label": "Cung hàm dưới trái", "teeth": [tooth for tooth in teeth if 31 <= tooth.tooth_number <= 38]},
+            {"label": "Cung hàm dưới phải", "teeth": [tooth for tooth in teeth if 41 <= tooth.tooth_number <= 48]},
         ]
         context["tooth_state_options"] = [
-            {"value": ToothStatus.CAVITY, "label": "Sau rang"},
-            {"value": ToothStatus.TREATED, "label": "Tram"},
-            {"value": ToothStatus.MISSING, "label": "Nho"},
-            {"value": ToothStatus.NORMAL, "label": "Binh thuong"},
+            {"value": ToothStatus.CAVITY, "label": "Sâu răng"},
+            {"value": ToothStatus.TREATED, "label": "Trám"},
+            {"value": ToothStatus.MISSING, "label": "Nhổ"},
+            {"value": ToothStatus.NORMAL, "label": "Bình thường"},
         ]
         context["tooth_status_labels"] = dict(ToothStatus.choices)
         context["tooth_states_data"] = (

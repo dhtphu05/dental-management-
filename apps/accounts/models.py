@@ -3,10 +3,10 @@ from django.db import models
 
 
 class UserRole(models.TextChoices):
-    ADMIN = "admin", "Admin"
-    DOCTOR = "doctor", "Doctor"
-    RECEPTIONIST = "receptionist", "Receptionist"
-    PATIENT = "patient", "Patient"
+    ADMIN = "admin", "Quản trị viên"
+    DOCTOR = "doctor", "Bác sĩ"
+    RECEPTIONIST = "receptionist", "Lễ tân"
+    PATIENT = "patient", "Bệnh nhân"
 
 
 class CustomUser(AbstractUser):

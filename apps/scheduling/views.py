@@ -42,9 +42,9 @@ class BookingSlotMixin:
             "booked_slots": self.get_booked_slots_lookup(),
             "today": date.today().isoformat(),
             "booking_steps": [
-                {"number": 1, "title": "Thong tin", "description": "Khach hang"},
-                {"number": 2, "title": "Khung gio", "description": "Chon lich hen"},
-                {"number": 3, "title": "Tai khoan", "description": "Tao tai khoan va xac nhan"},
+                {"number": 1, "title": "Thông tin", "description": "Khách hàng"},
+                {"number": 2, "title": "Khung giờ", "description": "Chọn lịch hẹn"},
+                {"number": 3, "title": "Xác nhận", "description": "Kiểm tra trước khi gửi"},
             ],
         }
 
@@ -65,6 +65,25 @@ class AppointmentDetailView(AppointmentAccessMixin, DetailView):
     model = Appointment
     template_name = "scheduling/appointment_detail.html"
     context_object_name = "appointment"
+
+    def get_queryset(self):
+        return Appointment.objects.select_related(
+            "patient",
+            "doctor",
+            "treatment_plan",
+            "treatment_plan__invoice",
+        ).prefetch_related(
+            "treatment_plan__services",
+            "treatment_plan__teeth",
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        treatment_plan = getattr(self.object, "treatment_plan", None)
+        invoice = getattr(treatment_plan, "invoice", None) if treatment_plan else None
+        context["treatment_plan"] = treatment_plan
+        context["invoice"] = invoice
+        return context
 
 
 class PublicBookingView(BookingSlotMixin, FormView):
@@ -166,7 +185,7 @@ class AppointmentCreateView(AppointmentAccessMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Them lich hen"
+        context["page_title"] = "Thêm lịch hẹn"
         return context
 
     def get_initial(self):
@@ -202,7 +221,7 @@ class AppointmentUpdateView(AppointmentAccessMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Cap nhat lich hen"
+        context["page_title"] = "Cập nhật lịch hẹn"
         return context
 
 
@@ -213,5 +232,5 @@ class AppointmentDeleteView(AppointmentAccessMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Xoa lich hen"
+        context["page_title"] = "Xóa lịch hẹn"
         return context

@@ -28,8 +28,10 @@
                         <td>{{ service.price }}</td>
                         <td>{{ service.estimated_duration }}</td>
                         <td class="text-right">
-                            <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'service-update' service.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>
-                            <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'service-delete' service.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xóa</a>
+                            <div class="row-actions">
+                                <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'service-update' service.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>
+                                <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'service-delete' service.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xóa</a>
+                            </div>
                         </td>
                     </tr>
                 {% empty %}

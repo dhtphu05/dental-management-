@@ -21,3 +21,13 @@ class PatientForm(forms.ModelForm):
             "medical_history": forms.Textarea(attrs={"rows": 3}),
             "notes": forms.Textarea(attrs={"rows": 3}),
         }
+        labels = {
+            "user": "Tài khoản liên kết",
+            "full_name": "Họ và tên",
+            "phone": "Số điện thoại",
+            "email": "Email",
+            "date_of_birth": "Ngày sinh",
+            "address": "Địa chỉ",
+            "medical_history": "Tiền sử bệnh",
+            "notes": "Ghi chú",
+        }

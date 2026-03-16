@@ -14,6 +14,15 @@ class AppointmentForm(forms.ModelForm):
             "time_slot": forms.TimeInput(attrs={"type": "time"}),
             "notes": forms.Textarea(attrs={"rows": 3}),
         }
+        labels = {
+            "patient": "Bệnh nhân",
+            "doctor": "Bác sĩ",
+            "date": "Ngày khám",
+            "time_slot": "Khung giờ",
+            "status": "Trạng thái",
+            "reason": "Lý do khám",
+            "notes": "Ghi chú",
+        }
 
 
 class BookingAppointmentForm(forms.ModelForm):
@@ -24,6 +33,14 @@ class BookingAppointmentForm(forms.ModelForm):
             "date": forms.DateInput(attrs={"type": "date"}),
             "time_slot": forms.HiddenInput(),
             "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+        labels = {
+            "patient": "Bệnh nhân",
+            "doctor": "Bác sĩ",
+            "date": "Ngày khám",
+            "time_slot": "Khung giờ",
+            "reason": "Lý do khám",
+            "notes": "Ghi chú",
         }
 
     def __init__(self, *args, **kwargs):

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Lịch sử khám của tôi{% endblock %}
+
+{% block content %}
+<section class="hero-panel fade-in mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+        <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-brand-700)]">Hồ sơ bệnh án cá nhân</p>
+        <h1 class="mb-2">Lịch sử khám của tôi</h1>
+        <p class="section-subtitle">Xem lại các lần khám đã hoàn tất, chẩn đoán, dịch vụ thực hiện và thông tin hóa đơn.</p>
+    </div>
+    <a class="btn-secondary" href="{% url 'dashboard' %}"><i data-lucide="layout-dashboard" class="icon-sm"></i>Về bảng điều khiển</a>
+</section>
+
+<section class="surface-card fade-in-delay-1 mb-6">
+    <div class="mb-5 flex items-center justify-between gap-4">
+        <div>
+            <h2 class="section-title !text-xl">Bộ lọc tra cứu</h2>
+            <p class="section-subtitle">Lọc theo bác sĩ, khoảng thời gian và trạng thái hóa đơn.</p>
+        </div>
+        {% if active_filter_count %}
+            <a class="btn-ghost" href="{% url 'patient-history' %}"><i data-lucide="rotate-ccw" class="icon-sm"></i>Xóa bộ lọc</a>
+        {% endif %}
+    </div>
+    <form method="get" class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">Bác sĩ</label>
+            <select name="doctor">
+                <option value="">Tất cả bác sĩ</option>
+                {% for doctor in doctor_options %}
+                    <option value="{{ doctor.pk }}" {% if active_filters.doctor == doctor.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ doctor.get_full_name|default:doctor.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">Từ ngày</label>
+            <input type="date" name="date_from" value="{{ active_filters.date_from }}">
+        </div>
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">Đến ngày</label>
+            <input type="date" name="date_to" value="{{ active_filters.date_to }}">
+        </div>
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">Hóa đơn</label>
+            <select name="invoice_status">
+                <option value="">Tất cả trạng thái</option>
+                {% for value, label in invoice_status_options %}
+                    <option value="{{ value }}" {% if active_filters.invoice_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="md:col-span-2 xl:col-span-4 flex flex-wrap gap-3">
+            <button class="btn-primary" type="submit"><i data-lucide="filter" class="icon-sm"></i>Áp dụng bộ lọc</button>
+            <a class="btn-secondary" href="{% url 'patient-history' %}"><i data-lucide="list-restart" class="icon-sm"></i>Đặt lại</a>
+        </div>
+    </form>
+</section>
+
+<section class="table-shell fade-in-delay-1">
+    <div class="overflow-x-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ngày khám</th>
+                    <th>Bác sĩ</th>
+                    <th>Chẩn đoán</th>
+                    <th>Hóa đơn</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                    <tr class="table-row">
+                        <td>{{ record.appointment.date|date:"d/m/Y" }} {{ record.appointment.time_slot|time:"H:i" }}</td>
+                        <td>{{ record.appointment.doctor.get_full_name|default:record.appointment.doctor.username }}</td>
+                        <td>{{ record.treatment_plan.diagnosis|default:"Chưa có chẩn đoán" }}</td>
+                        <td>
+                            {% if record.invoice %}
+                                {{ record.invoice.get_status_display }}
+                            {% else %}
+                                Chưa có hóa đơn
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            <a class="btn-primary !px-3 !py-2 !text-xs" href="{% url 'patient-history-detail' record.appointment.pk %}"><i data-lucide="file-text" class="icon-sm"></i>Xem chi tiết hồ sơ</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="table-row">
+                        <td colspan="5" class="text-[var(--color-ink-500)]">Bạn chưa có lượt khám hoàn tất nào để hiển thị trong lịch sử.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% if is_paginated %}
+<section class="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <p class="section-subtitle">Trang {{ page_obj.number }} / {{ paginator.num_pages }}</p>
+    <div class="flex flex-wrap gap-3">
+        {% if page_obj.has_previous %}
+            <a class="btn-secondary" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}"><i data-lucide="arrow-left" class="icon-sm"></i>Trang trước</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a class="btn-primary" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Trang sau<i data-lucide="arrow-right" class="icon-sm"></i></a>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

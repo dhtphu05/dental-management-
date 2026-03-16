@@ -13,12 +13,10 @@
         {% if request.user.role == "doctor" %}
             <a class="btn-primary" href="{% url 'doctor-treatment-plan' appointment.pk %}"><i data-lucide="file-pen-line" class="icon-sm"></i>Liệu trình</a>
         {% endif %}
+        {% if invoice and request.user.role != "doctor" %}
+            <a class="btn-primary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="receipt-text" class="icon-sm"></i>Cập nhật hóa đơn</a>
+        {% endif %}
     </div>
 </div>
-<div class="surface-card fade-in">
-    <p><strong>Bác sĩ:</strong> {{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</p>
-    <p><strong>Trạng thái:</strong> {{ appointment.get_status_display }}</p>
-    <p><strong>Lý do:</strong> {{ appointment.reason|default:"-" }}</p>
-    <p><strong>Ghi chú:</strong> {{ appointment.notes|default:"-" }}</p>
-</div>
+{% include "shared/appointment_record_sections.html" with appointment=appointment treatment_plan=treatment_plan invoice=invoice show_invoice_actions=True %}
 {% endblock %}

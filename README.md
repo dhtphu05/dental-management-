@@ -108,7 +108,41 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### 6. Run the development server
+### 6. Seed Vietnamese doctor accounts
+
+```bash
+python manage.py seed_vietnamese_doctors
+```
+
+Default doctor password:
+
+```text
+Dental@123
+```
+
+If you want to reset all seeded doctor passwords back to the default:
+
+```bash
+python manage.py seed_vietnamese_doctors --reset-passwords
+```
+
+### 7. Seed full demo data
+
+```bash
+python manage.py seed_demo_data
+```
+
+This command creates:
+
+- Admin and receptionist accounts
+- Vietnamese doctor accounts
+- Demo patient records
+- Services
+- Appointments in multiple statuses
+- Treatment plans
+- Invoices
+
+### 8. Run the development server
 
 ```bash
 python manage.py runserver

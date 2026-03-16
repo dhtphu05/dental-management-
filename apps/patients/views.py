@@ -31,7 +31,7 @@ class PatientCreateView(PatientAccessMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Them benh nhan"
+        context["page_title"] = "Thêm bệnh nhân"
         return context
 
 
@@ -43,7 +43,7 @@ class PatientUpdateView(PatientAccessMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Cap nhat benh nhan"
+        context["page_title"] = "Cập nhật bệnh nhân"
         return context
 
 
@@ -54,5 +54,5 @@ class PatientDeleteView(PatientAccessMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Xoa benh nhan"
+        context["page_title"] = "Xóa bệnh nhân"
         return context

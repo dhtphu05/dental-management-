@@ -37,7 +37,7 @@ class InvoiceUpdateView(InvoiceAccessMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Cap nhat hoa don"
+        context["page_title"] = "Cập nhật hóa đơn"
         return context
 
 
@@ -48,5 +48,5 @@ class InvoiceDeleteView(InvoiceAccessMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Xoa hoa don"
+        context["page_title"] = "Xóa hóa đơn"
         return context

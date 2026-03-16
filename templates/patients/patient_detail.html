@@ -30,7 +30,7 @@
         <ul class="mt-4 space-y-3">
                     {% for appointment in patient.appointments.all %}
                         <li class="flex items-center justify-between rounded-3xl bg-slate-50 px-4 py-4">
-                            <span>{{ appointment.date }} {{ appointment.time_slot|time:"H:i" }} - {{ appointment.status }}</span>
+                            <span>{{ appointment.date }} {{ appointment.time_slot|time:"H:i" }} - {{ appointment.get_status_display }}</span>
                             <a class="btn-ghost" href="{% url 'appointment-detail' appointment.pk %}"><i data-lucide="eye" class="icon-sm"></i>Xem</a>
                         </li>
                     {% empty %}

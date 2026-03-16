@@ -2,9 +2,9 @@ from django.db import models
 
 
 class InvoiceStatus(models.TextChoices):
-    DRAFT = "draft", "Draft"
-    ISSUED = "issued", "Issued"
-    PAID = "paid", "Paid"
+    DRAFT = "draft", "Bản nháp"
+    ISSUED = "issued", "Đã phát hành"
+    PAID = "paid", "Đã thanh toán"
 
 
 class Invoice(models.Model):

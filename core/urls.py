@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
-from apps.accounts.forms import PhoneAuthenticationForm
+from apps.accounts.forms import MixedAuthenticationForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,7 +26,7 @@ urlpatterns = [
         "accounts/login/",
         auth_views.LoginView.as_view(
             template_name="registration/login.html",
-            authentication_form=PhoneAuthenticationForm,
+            authentication_form=MixedAuthenticationForm,
         ),
         name="login",
     ),

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Dental Project{% endblock %}</title>
+    <title>{% block title %}Nha khoa Dental Project{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -127,6 +127,12 @@
             color: var(--color-ink-700);
         }
 
+        table {
+            width: 100%;
+            min-width: 100%;
+            border-collapse: collapse;
+        }
+
         .app-shell {
             width: min(100%, 80rem);
             margin: 0 auto;
@@ -151,6 +157,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
             gap: 1rem;
             margin-bottom: 2rem;
             padding: 1rem 1.25rem;
@@ -159,10 +166,46 @@
             backdrop-filter: blur(18px);
         }
 
+        @media (min-width: 1024px) {
+            .topbar {
+                display: grid;
+                grid-template-columns: minmax(14rem, 20rem) minmax(0, 1fr) auto;
+                align-items: center;
+                gap: 1.25rem;
+            }
+        }
+
+        .brand-block {
+            min-width: 0;
+        }
+
+        .brand-copy {
+            min-width: 0;
+        }
+
+        .brand-title {
+            display: block;
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            color: var(--color-ink-900);
+        }
+
+        .brand-subtitle {
+            display: block;
+            margin-top: 0.45rem;
+            color: var(--color-ink-500);
+            font-size: 0.95rem;
+            line-height: 1.3;
+        }
+
         .nav-links {
             display: none;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
+            gap: 0.75rem;
+            min-width: 0;
         }
 
         @media (min-width: 1024px) {
@@ -191,6 +234,8 @@
             font-size: 0.92rem;
             font-weight: 500;
             color: var(--color-ink-700);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .nav-link:hover {
@@ -213,6 +258,21 @@
             box-shadow: var(--shadow-soft);
         }
 
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .user-chip {
+            max-width: 19rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .hero-panel {
             border-radius: 2rem;
             padding: 1.5rem;
@@ -222,7 +282,8 @@
         .surface-card,
         .surface-card-danger,
         .metric-card,
-        .doctor-chart-card {
+        .doctor-chart-card,
+        .doctor-stat-card {
             border-radius: 2rem;
             background: rgba(255, 255, 255, 0.95);
             padding: 1.5rem;
@@ -242,6 +303,11 @@
         .metric-card,
         .doctor-stat-card {
             border-radius: 24px;
+        }
+
+        .doctor-stat-card {
+            min-width: 0;
+            overflow: hidden;
         }
 
         .btn-primary {
@@ -318,6 +384,11 @@
             overflow: hidden;
             border-radius: 2rem;
             background: white;
+            width: 100%;
+        }
+
+        .table-shell .overflow-x-auto {
+            width: 100%;
         }
 
         .table-row {
@@ -339,6 +410,15 @@
             color: var(--color-brand-700);
             font-size: 0.74rem;
             font-weight: 600;
+        }
+
+        .row-actions {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .checkbox-grid {
@@ -555,26 +635,27 @@
         .doctor-shell {
             display: grid;
             gap: 1.5rem;
+            align-items: start;
         }
 
         @media (min-width: 1024px) {
             .doctor-shell {
-                grid-template-columns: auto 1fr;
+                display: block;
             }
         }
 
         .doctor-sidebar {
-            position: sticky;
-            top: 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            height: fit-content;
             padding: 1rem;
             border-radius: 2rem;
             background: white;
             box-shadow: var(--shadow-soft);
-            transition: width 0.3s ease;
+            transition: width 0.3s ease, left 0.3s ease;
+            align-self: start;
+            max-height: calc(100vh - 8rem);
+            overflow-y: auto;
         }
 
         .doctor-sidebar-collapsed {
@@ -602,6 +683,23 @@
 
         .doctor-main {
             min-width: 0;
+        }
+
+        @media (min-width: 1024px) {
+            .doctor-sidebar {
+                position: fixed;
+                top: 9.5rem;
+                left: max(1rem, calc((100vw - 80rem) / 2 + 1rem));
+                z-index: 10;
+            }
+
+            .doctor-main {
+                margin-left: 19.5rem;
+            }
+
+            .doctor-sidebar-collapsed + .doctor-main {
+                margin-left: 7.5rem;
+            }
         }
 
         .doctor-stat-icon {
@@ -661,11 +759,11 @@
 <body>
     <header class="app-shell pb-0">
         <nav class="topbar fade-in">
-            <a class="flex items-center gap-4" href="{% url 'dashboard' %}">
+            <a class="brand-block flex min-w-0 items-center gap-4" href="{% url 'dashboard' %}">
                 <span class="brand-mark">DN</span>
-                <span>
-                    <span class="block text-base font-extrabold tracking-tight text-[var(--color-ink-900)]">Dental Project</span>
-                    <span class="block text-xs text-[var(--color-ink-500)]">Nền tảng quản lý nha khoa hiện đại</span>
+                <span class="brand-copy">
+                    <span class="brand-title">Nha khoa Dental Project</span>
+                    <span class="brand-subtitle">Nền tảng quản lý nha khoa hiện đại</span>
                 </span>
             </a>
             {% if request.user.is_authenticated and request.user.role != "patient" %}
@@ -674,12 +772,17 @@
                     <a class="nav-link" href="{% url 'appointment-list' %}"><i data-lucide="calendar-days" class="icon-sm"></i>Lịch hẹn</a>
                     <a class="nav-link" href="{% url 'service-list' %}"><i data-lucide="stethoscope" class="icon-sm"></i>Dịch vụ</a>
                     <a class="nav-link" href="{% url 'invoice-list' %}"><i data-lucide="receipt-text" class="icon-sm"></i>Hóa đơn</a>
-                    <a class="nav-link" href="{% url 'design-system' %}"><i data-lucide="swatch-book" class="icon-sm"></i>Design System</a>
+                    <a class="nav-link" href="{% url 'design-system' %}"><i data-lucide="swatch-book" class="icon-sm"></i>Hệ thống giao diện</a>
+                </div>
+            {% elif request.user.is_authenticated and request.user.role == "patient" %}
+                <div class="nav-links">
+                    <a class="nav-link" href="{% url 'dashboard' %}"><i data-lucide="layout-dashboard" class="icon-sm"></i>Bảng điều khiển</a>
+                    <a class="nav-link" href="{% url 'patient-history' %}"><i data-lucide="files" class="icon-sm"></i>Lịch sử khám</a>
                 </div>
             {% endif %}
-            <div class="flex items-center gap-3">
+            <div class="topbar-actions">
                 {% if request.user.is_authenticated %}
-                    <span class="hidden items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-[var(--color-ink-700)] md:inline-flex"><i data-lucide="user-round" class="icon-sm"></i>{{ request.user }}</span>
+                    <span class="user-chip hidden items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-[var(--color-ink-700)] md:inline-flex"><i data-lucide="user-round" class="icon-sm"></i>{{ request.user }}</span>
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
                         <button class="btn-secondary !px-4 !py-2" type="submit"><i data-lucide="log-out" class="icon-sm"></i>Đăng xuất</button>

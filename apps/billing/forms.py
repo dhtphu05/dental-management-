@@ -7,3 +7,6 @@ class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
         fields = ["status"]
+        labels = {
+            "status": "Trạng thái hóa đơn",
+        }

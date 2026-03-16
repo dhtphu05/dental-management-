@@ -12,6 +12,12 @@ class ServiceForm(forms.ModelForm):
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
         }
+        labels = {
+            "name": "Tên dịch vụ",
+            "price": "Giá tiền",
+            "estimated_duration": "Thời gian ước tính",
+            "description": "Mô tả",
+        }
 
 
 class TreatmentPlanForm(forms.ModelForm):
@@ -33,6 +39,13 @@ class TreatmentPlanForm(forms.ModelForm):
         widgets = {
             "diagnosis": forms.Textarea(attrs={"rows": 3}),
             "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+        labels = {
+            "diagnosis": "Chẩn đoán",
+            "notes": "Ghi chú",
+            "status": "Trạng thái liệu trình",
+            "resulting_tooth_status": "Trạng thái răng sau điều trị",
+            "services": "Dịch vụ thực hiện",
         }
 
     def __init__(self, *args, **kwargs):
@@ -59,7 +72,7 @@ class TreatmentPlanForm(forms.ModelForm):
         try:
             parsed = json.loads(raw_value)
         except json.JSONDecodeError as exc:
-            raise forms.ValidationError("Du lieu so do rang khong hop le.") from exc
+            raise forms.ValidationError("Dữ liệu sơ đồ răng không hợp lệ.") from exc
 
         valid_statuses = {choice for choice, _ in ToothStatus.choices}
         valid_ids = {str(tooth.pk) for tooth in self.fields["teeth"].queryset}

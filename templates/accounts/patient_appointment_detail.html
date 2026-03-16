@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Chi tiết hồ sơ khám{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+        <h1 class="mb-2">Chi tiết hồ sơ khám</h1>
+        <p class="section-subtitle">Lần khám ngày {{ appointment.date|date:"d/m/Y" }} lúc {{ appointment.time_slot|time:"H:i" }}</p>
+    </div>
+    <a class="btn-secondary" href="{% url 'patient-history' %}"><i data-lucide="arrow-left" class="icon-sm"></i>Quay lại lịch sử khám</a>
+</div>
+
+{% include "shared/appointment_record_sections.html" with appointment=appointment treatment_plan=treatment_plan invoice=invoice show_invoice_actions=False %}
+{% endblock %}

@@ -15,11 +15,11 @@ class Service(models.Model):
 
 
 class ToothStatus(models.TextChoices):
-    NORMAL = "normal", "Binh thuong"
-    CAVITY = "cavity", "Sau rang"
-    CROWN = "crown", "Rang su"
-    MISSING = "missing", "Mat rang"
-    TREATED = "treated", "Da dieu tri"
+    NORMAL = "normal", "Bình thường"
+    CAVITY = "cavity", "Sâu răng"
+    CROWN = "crown", "Răng sứ"
+    MISSING = "missing", "Mất răng"
+    TREATED = "treated", "Đã điều trị"
 
 
 class Tooth(models.Model):
@@ -44,9 +44,9 @@ class Tooth(models.Model):
 
 
 class TreatmentPlanStatus(models.TextChoices):
-    PLANNED = "planned", "Planned"
-    IN_PROGRESS = "in_progress", "In Progress"
-    COMPLETED = "completed", "Completed"
+    PLANNED = "planned", "Đã lên kế hoạch"
+    IN_PROGRESS = "in_progress", "Đang thực hiện"
+    COMPLETED = "completed", "Hoàn tất"
 
 
 class TreatmentPlan(models.Model):
@@ -60,7 +60,7 @@ class TreatmentPlan(models.Model):
         max_length=20,
         choices=ToothStatus.choices,
         default=ToothStatus.TREATED,
-        help_text="Trang thai se duoc cap nhat cho cac rang khi hoan tat lieu trinh.",
+        help_text="Trạng thái sẽ được cập nhật cho các răng khi hoàn tất liệu trình.",
     )
     completed_at = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)

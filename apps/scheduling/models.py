@@ -5,10 +5,10 @@ from django.db.models import Q
 
 
 class AppointmentStatus(models.TextChoices):
-    PENDING = "pending", "Pending"
-    CONFIRMED = "confirmed", "Confirmed"
-    COMPLETED = "completed", "Completed"
-    CANCELLED = "cancelled", "Cancelled"
+    PENDING = "pending", "Chờ xác nhận"
+    CONFIRMED = "confirmed", "Đã xác nhận"
+    COMPLETED = "completed", "Hoàn tất"
+    CANCELLED = "cancelled", "Đã hủy"
 
 
 class Appointment(models.Model):
@@ -49,7 +49,7 @@ class Appointment(models.Model):
 
         if conflicting.exclude(status=AppointmentStatus.CANCELLED).exists():
             raise ValidationError(
-                {"time_slot": "Bac si da co lich hen o khung gio nay."}
+                {"time_slot": "Bác sĩ đã có lịch hẹn ở khung giờ này."}
             )
 
     def save(self, *args, **kwargs):
