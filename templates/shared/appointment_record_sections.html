@@ -1,11 +1,12 @@
+{% load currency %}
 <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
     <section class="surface-card fade-in">
         <h2 class="section-title !text-xl">Thông tin lịch hẹn</h2>
         <div class="mt-4 grid gap-4 md:grid-cols-2">
             <div class="summary-row"><span class="text-[var(--color-ink-500)]">Bệnh nhân</span><span class="font-semibold text-[var(--color-ink-900)]">{{ appointment.patient.full_name }}</span></div>
             <div class="summary-row"><span class="text-[var(--color-ink-500)]">Bác sĩ</span><span class="font-semibold text-[var(--color-ink-900)]">{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</span></div>
-            <div class="summary-row"><span class="text-[var(--color-ink-500)]">Ngày khám</span><span class="font-semibold text-[var(--color-brand-700)]">{{ appointment.date|date:"d/m/Y" }}</span></div>
-            <div class="summary-row"><span class="text-[var(--color-ink-500)]">Khung giờ</span><span class="font-semibold text-[var(--color-brand-700)]">{{ appointment.time_slot|time:"H:i" }}</span></div>
+            <div class="summary-row"><span class="text-[var(--color-ink-500)]">Ngày khám</span><span class="font-semibold text-[var(--color-brand-700)]">{{ appointment.date|vi_date_long }}</span></div>
+            <div class="summary-row"><span class="text-[var(--color-ink-500)]">Khung giờ</span><span class="font-semibold text-[var(--color-brand-700)]">{{ appointment.time_slot|vi_time }}</span></div>
             <div class="summary-row md:col-span-2"><span class="text-[var(--color-ink-500)]">Trạng thái</span><span class="badge-soft">{{ appointment.get_status_display }}</span></div>
             <div class="summary-row md:col-span-2"><span class="text-[var(--color-ink-500)]">Lý do khám</span><span class="font-semibold text-[var(--color-ink-900)]">{{ appointment.reason|default:"-" }}</span></div>
             <div class="summary-row md:col-span-2"><span class="text-[var(--color-ink-500)]">Ghi chú</span><span class="font-semibold text-[var(--color-ink-900)]">{{ appointment.notes|default:"-" }}</span></div>
@@ -22,8 +23,8 @@
         {% if invoice %}
             <div class="space-y-4">
                 <div class="summary-row"><span class="text-[var(--color-ink-500)]">Mã hóa đơn</span><span class="font-semibold text-[var(--color-ink-900)]">#{{ invoice.pk }}</span></div>
-                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Ngày phát hành</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.issued_at|date:"d/m/Y H:i" }}</span></div>
-                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Tổng tiền</span><span class="font-semibold text-[var(--color-brand-700)]">{{ invoice.total_amount }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Ngày phát hành</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.issued_at|vi_datetime }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Tổng tiền</span><span class="font-semibold text-[var(--color-brand-700)]">{{ invoice.total_amount|vnd }}</span></div>
             </div>
             {% if show_invoice_actions %}
                 <div class="mt-5 flex flex-wrap gap-3">
@@ -70,8 +71,8 @@
                                                 <div class="mt-1 text-sm text-[var(--color-ink-500)]">{{ service.description|default:"Không có mô tả thêm." }}</div>
                                             </div>
                                             <div class="text-right">
-                                                <div class="font-semibold text-[var(--color-brand-700)]">{{ service.price }}</div>
-                                                <div class="text-xs text-[var(--color-ink-500)]">{{ service.estimated_duration }}</div>
+                                                <div class="font-semibold text-[var(--color-brand-700)]">{{ service.price|vnd }}</div>
+                                                <div class="text-xs text-[var(--color-ink-500)]">{{ service.estimated_duration|duration_vi }}</div>
                                             </div>
                                         </div>
                                     </div>

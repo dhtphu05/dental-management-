@@ -86,7 +86,7 @@
             <div class="surface-card fade-in space-y-5">
                 <div>
                     <h2 class="section-title !text-xl">Bước 2: Chọn bác sĩ và ngày khám</h2>
-                    <p class="section-subtitle">Chọn bác sĩ trước, sau đó chọn ngày để xem các khung giờ còn trống.</p>
+                    <p class="section-subtitle">Bạn có thể chọn bác sĩ cụ thể hoặc để hệ thống tự tìm bác sĩ còn trống cho khung giờ phù hợp.</p>
                 </div>
 
                 <div>
@@ -103,7 +103,7 @@
 
                 <div class="rounded-3xl bg-brand-50 p-5 text-sm text-ink-700">
                     <p class="font-semibold text-brand-700">Lưu ý</p>
-                    <p class="mt-2">Khung giờ màu xám là đã có người đặt. Bạn vẫn có thể đi hết bước này mà chưa cần tài khoản.</p>
+                    <p class="mt-2">Nếu chọn “Bất kỳ bác sĩ phù hợp”, hệ thống sẽ tự gán bác sĩ còn trống khi bạn xác nhận đặt lịch.</p>
                 </div>
             </div>
 
@@ -184,8 +184,10 @@
 </form>
 
 {{ booked_slots|json_script:"booked-slots-data" }}
+{{ doctor_ids|json_script:"booking-doctor-ids" }}
 <script>
     const bookedSlots = JSON.parse(document.getElementById("booked-slots-data").textContent);
+    const doctorIds = JSON.parse(document.getElementById("booking-doctor-ids").textContent);
     const doctorField = document.getElementById("id_doctor");
     const dateField = document.getElementById("id_date");
     const timeSlotField = document.getElementById("id_time_slot");
@@ -214,12 +216,20 @@
     const syncSlots = () => {
         const doctorId = doctorField.value;
         const selectedDate = dateField.value;
-        const disabledSlots = new Set(((bookedSlots[doctorId] || {})[selectedDate]) || []);
         const currentValue = timeSlotField.value;
 
         slotButtons.forEach((button) => {
             const slot = button.dataset.slot;
-            const isDisabled = disabledSlots.has(slot);
+            let isDisabled = false;
+            if (doctorId) {
+                const disabledSlots = new Set(((bookedSlots[doctorId] || {})[selectedDate]) || []);
+                isDisabled = disabledSlots.has(slot);
+            } else if (selectedDate) {
+                isDisabled = doctorIds.every((id) => {
+                    const disabledSlots = new Set(((bookedSlots[id] || {})[selectedDate]) || []);
+                    return disabledSlots.has(slot);
+                });
+            }
             button.disabled = isDisabled;
             button.classList.toggle("slot-button-disabled", isDisabled);
             button.classList.toggle("slot-button-active", !isDisabled && currentValue === slot);
@@ -260,7 +270,7 @@
             return fullNameField.value.trim() && phoneField.value.trim();
         }
         if (currentStep === 2) {
-            return doctorField.value && dateField.value && timeSlotField.value;
+            return dateField.value && timeSlotField.value;
         }
         return true;
     };

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency %}
 
 {% block title %}Hóa đơn{% endblock %}
 
@@ -24,7 +25,7 @@
                     <tr class="table-row">
                         <td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.treatment_plan.appointment.patient.full_name }}</a></td>
                         <td>{{ invoice.treatment_plan.appointment.doctor.get_full_name|default:invoice.treatment_plan.appointment.doctor.username }}</td>
-                        <td>{{ invoice.total_amount }}</td>
+                        <td>{{ invoice.total_amount|vnd }}</td>
                         <td>{{ invoice.get_status_display }}</td>
                         <td class="text-right">
                             <div class="row-actions">

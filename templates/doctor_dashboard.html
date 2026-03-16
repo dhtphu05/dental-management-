@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency %}
 
 {% block title %}Bảng điều khiển bác sĩ{% endblock %}
 
@@ -47,7 +48,7 @@
             <div>
                 <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-brand-700)]">Bảng điều khiển bác sĩ</p>
                 <h1 class="mb-2">Bức tranh công việc hôm nay</h1>
-                <p class="section-subtitle">Theo dõi lượng bệnh nhân, doanh thu liên quan và các lịch hẹn trong ngày {{ today|date:"d/m/Y" }}.</p>
+                <p class="section-subtitle">Theo dõi lượng bệnh nhân, doanh thu liên quan và các lịch hẹn trong ngày {{ today|vi_date_long }}.</p>
             </div>
             <a class="btn-primary" href="{% url 'appointment-list' %}">
                 <i data-lucide="calendar-plus-2" class="icon-sm"></i>
@@ -71,7 +72,7 @@
                     <span class="badge-soft">Đã phát sinh</span>
                 </div>
                 <div class="text-sm font-semibold text-[var(--color-ink-500)]">Doanh thu</div>
-                <div class="mt-2 text-3xl font-extrabold text-[var(--color-ink-900)]">{{ doctor_revenue }}</div>
+                <div class="mt-2 text-3xl font-extrabold text-[var(--color-ink-900)]">{{ doctor_revenue|vnd }}</div>
             </article>
 
             <article class="doctor-stat-card fade-in-delay-2">
@@ -115,7 +116,7 @@
                                     <div class="mt-1 text-sm text-[var(--color-ink-500)]">{{ appointment.reason|default:"Tái khám định kỳ" }}</div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="font-semibold text-[var(--color-brand-700)]">{{ appointment.time_slot|time:"H:i" }}</div>
+                                    <div class="font-semibold text-[var(--color-brand-700)]">{{ appointment.time_slot|vi_time }}</div>
                                     <div class="text-xs uppercase tracking-[0.14em] text-[var(--color-ink-500)]">{{ appointment.get_status_display }}</div>
                                 </div>
                             </div>
@@ -156,8 +157,8 @@
                                     <div class="font-semibold text-[var(--color-ink-900)]">{{ appointment.patient.full_name }}</div>
                                     <div class="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-500)]">Mã bệnh nhân #{{ appointment.patient.pk }}</div>
                                 </td>
-                                <td>{{ appointment.date|date:"d/m/Y" }}</td>
-                                <td>{{ appointment.time_slot|time:"H:i" }}</td>
+                                <td>{{ appointment.date|vi_date }}</td>
+                                <td>{{ appointment.time_slot|vi_time }}</td>
                                 <td><span class="badge-soft">{{ appointment.get_status_display }}</span></td>
                                 <td class="text-right">
                                     <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'doctor-treatment-plan' appointment.pk %}">

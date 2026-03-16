@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency %}
 
 {% block title %}Dịch vụ{% endblock %}
 
@@ -25,8 +26,8 @@
                 {% for service in services %}
                     <tr class="table-row">
                         <td>{{ service.name }}</td>
-                        <td>{{ service.price }}</td>
-                        <td>{{ service.estimated_duration }}</td>
+                        <td>{{ service.price|vnd }}</td>
+                        <td>{{ service.estimated_duration|duration_vi }}</td>
                         <td class="text-right">
                             <div class="row-actions">
                                 <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'service-update' service.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>

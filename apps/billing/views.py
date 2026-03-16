@@ -28,6 +28,15 @@ class InvoiceDetailView(InvoiceAccessMixin, DetailView):
     template_name = "billing/invoice_detail.html"
     context_object_name = "invoice"
 
+    def get_queryset(self):
+        return Invoice.objects.select_related(
+            "treatment_plan__appointment__patient",
+            "treatment_plan__appointment__doctor",
+        ).prefetch_related(
+            "treatment_plan__services",
+            "treatment_plan__teeth",
+        )
+
 
 class InvoiceUpdateView(InvoiceAccessMixin, UpdateView):
     model = Invoice

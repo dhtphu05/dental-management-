@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load currency %}
+
+{% block title %}Phòng khám Thiên Phú{% endblock %}
+
+{% block content %}
+<section id="gioi-thieu" class="hero-panel fade-in mb-8 overflow-hidden">
+    <div class="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
+        <div class="space-y-5">
+            <span class="badge-soft">Phòng khám Thiên Phú</span>
+            <h1 class="max-w-3xl">Chăm sóc răng miệng nhẹ nhàng, minh bạch và đúng lịch cho cả gia đình.</h1>
+            <p class="max-w-2xl text-lg text-[var(--color-ink-700)]">
+                Thiên Phú là phòng khám nha khoa tổng quát và thẩm mỹ với đội ngũ bác sĩ giàu kinh nghiệm,
+                quy trình rõ ràng và hệ thống đặt lịch trực tuyến giúp bạn chủ động theo dõi mọi lần thăm khám.
+            </p>
+            <div class="flex flex-wrap gap-3">
+                <a class="btn-primary !rounded-[1.35rem] !px-6 !py-4" href="{% url 'public-booking' %}">
+                    <i data-lucide="calendar-heart" class="icon-sm"></i>Đặt lịch ngay
+                </a>
+                <a class="btn-secondary !rounded-[1.35rem] !px-6 !py-4" href="{% url 'login' %}">
+                    <i data-lucide="log-in" class="icon-sm"></i>Đăng nhập
+                </a>
+            </div>
+            <div class="grid gap-4 pt-2 sm:grid-cols-3">
+                <div class="metric-card !p-5">
+                    <div class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">Bác sĩ</div>
+                    <div class="text-3xl font-extrabold text-[var(--color-brand-700)]">{{ doctor_count }}</div>
+                </div>
+                <div class="metric-card !p-5">
+                    <div class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">Dịch vụ</div>
+                    <div class="text-3xl font-extrabold text-[var(--color-brand-700)]">{{ service_count }}</div>
+                </div>
+                <div class="metric-card !p-5">
+                    <div class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">Khách hàng</div>
+                    <div class="text-3xl font-extrabold text-[var(--color-brand-700)]">{{ patient_count }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="surface-card !rounded-[2.2rem] bg-white/90">
+            <div class="mb-5 flex items-center justify-between">
+                <div>
+                    <div class="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--color-brand-700)]">Lịch tiếp nhận</div>
+                    <div class="mt-1 text-2xl font-bold text-[var(--color-ink-900)]">Thứ 2 - Chủ nhật</div>
+                </div>
+                <div class="doctor-stat-icon"><i data-lucide="clock-3" class="icon-md"></i></div>
+            </div>
+            <div class="space-y-4">
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Sáng</span><span class="font-semibold text-[var(--color-ink-900)]">08:00 - 11:30</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Chiều</span><span class="font-semibold text-[var(--color-ink-900)]">13:00 - 17:30</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Địa chỉ</span><span class="font-semibold text-[var(--color-ink-900)]">54 Nguyễn Lương Bằng, Phường Liên Chiểu, thành phố Đà Nẵng</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Hotline</span><span class="font-semibold text-[var(--color-brand-700)]">0909 123 456</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="dich-vu" class="mb-8 grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+    <div class="surface-card fade-in">
+        <h2 class="section-title">Điều khách hàng cần ở một phòng khám thật</h2>
+        <p class="section-subtitle mb-5">Ít thủ tục, ít chờ đợi, rõ chi phí và dễ theo dõi lịch sử điều trị sau mỗi lần tái khám.</p>
+        <div class="space-y-4">
+            <div class="summary-row"><span class="text-[var(--color-ink-500)]">Khám tổng quát và tư vấn</span><span class="font-semibold text-[var(--color-ink-900)]">Trong ngày</span></div>
+            <div class="summary-row"><span class="text-[var(--color-ink-500)]">Nhắc lịch và theo dõi tái khám</span><span class="font-semibold text-[var(--color-ink-900)]">Trực tuyến</span></div>
+            <div class="summary-row"><span class="text-[var(--color-ink-500)]">Liệu trình và chi phí</span><span class="font-semibold text-[var(--color-ink-900)]">Minh bạch</span></div>
+        </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+        {% for service in featured_services %}
+            <article class="surface-card fade-in-delay-1 !p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <div class="doctor-stat-icon !h-12 !w-12"><i data-lucide="sparkles" class="icon-md"></i></div>
+                    <span class="badge-soft">{{ service.estimated_duration|duration_vi }}</span>
+                </div>
+                <h3 class="mb-2">{{ service.name }}</h3>
+                <p class="mb-4 text-[var(--color-ink-700)]">{{ service.description|default:"Dịch vụ được thực hiện theo lịch hẹn, bác sĩ sẽ tư vấn cụ thể trong buổi khám." }}</p>
+                <div class="text-xl font-bold text-[var(--color-brand-700)]">{{ service.price|vnd }}</div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="quy-trinh" class="surface-card fade-in mb-8">
+    <div class="mb-6">
+        <h2 class="section-title">Quy trình đặt lịch đơn giản</h2>
+        <p class="section-subtitle">Tối ưu cho khách hàng mới, nhưng vẫn đủ rõ ràng cho một website phòng khám vận hành thật.</p>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+        <div class="metric-card !p-6">
+            <div class="mb-4 doctor-stat-icon"><i data-lucide="user-round-search" class="icon-md"></i></div>
+            <h3 class="mb-2">1. Điền thông tin</h3>
+            <p class="text-[var(--color-ink-700)]">Nhập họ tên, số điện thoại và lý do khám.</p>
+        </div>
+        <div class="metric-card !p-6">
+            <div class="mb-4 doctor-stat-icon"><i data-lucide="calendar-range" class="icon-md"></i></div>
+            <h3 class="mb-2">2. Chọn lịch phù hợp</h3>
+            <p class="text-[var(--color-ink-700)]">Chọn bác sĩ cụ thể hoặc để hệ thống sắp xếp bác sĩ còn trống.</p>
+        </div>
+        <div class="metric-card !p-6">
+            <div class="mb-4 doctor-stat-icon"><i data-lucide="files" class="icon-md"></i></div>
+            <h3 class="mb-2">3. Theo dõi sau khám</h3>
+            <p class="text-[var(--color-ink-700)]">Đăng nhập để xem lịch hẹn, hồ sơ khám và hóa đơn của bạn.</p>
+        </div>
+    </div>
+</section>
+
+<section id="lien-he" class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+    <div class="surface-card fade-in">
+        <h2 class="section-title">Sẵn sàng đặt lịch?</h2>
+        <p class="section-subtitle mb-5">Đặt lịch trực tuyến trong vài phút hoặc đăng nhập để tiếp tục theo dõi hồ sơ đang có.</p>
+        <div class="flex flex-wrap gap-3">
+            <a class="btn-primary !rounded-[1.35rem] !px-6 !py-4" href="{% url 'public-booking' %}">
+                <i data-lucide="calendar-plus-2" class="icon-sm"></i>Đặt lịch hẹn
+            </a>
+            <a class="btn-secondary !rounded-[1.35rem] !px-6 !py-4" href="{% url 'login' %}">
+                <i data-lucide="shield-check" class="icon-sm"></i>Đăng nhập
+            </a>
+        </div>
+    </div>
+    <div class="surface-card fade-in-delay-1 !p-6">
+        <div class="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--color-brand-700)]">Liên hệ nhanh</div>
+        <div class="space-y-3 text-[var(--color-ink-700)]">
+            <div class="flex items-center gap-3"><i data-lucide="phone" class="icon-sm text-[var(--color-brand-700)]"></i><span>0909 123 456</span></div>
+            <div class="flex items-center gap-3"><i data-lucide="mail" class="icon-sm text-[var(--color-brand-700)]"></i><span>lienhe@phongkhamthienphu.vn</span></div>
+            <div class="flex items-center gap-3"><i data-lucide="map-pin" class="icon-sm text-[var(--color-brand-700)]"></i><span>54 Nguyễn Lương Bằng, Phường Liên Chiểu, thành phố Đà Nẵng</span></div>
+        </div>
+    </div>
+</section>
+{% endblock %}

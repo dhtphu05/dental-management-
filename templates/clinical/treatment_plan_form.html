@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency %}
 
 {% block title %}Cập nhật điều trị{% endblock %}
 
@@ -6,7 +7,7 @@
 <div class="mx-auto max-w-5xl">
     <div class="surface-card fade-in">
         <h1 class="mb-3">Cập nhật liệu trình cho {{ object.appointment.patient.full_name }}</h1>
-        <p class="section-subtitle mb-6">Lịch hẹn: {{ object.appointment.date }} {{ object.appointment.time_slot|time:"H:i" }}</p>
+        <p class="section-subtitle mb-6">Lịch hẹn: {{ object.appointment.date|vi_date_long }} lúc {{ object.appointment.time_slot|vi_time }}</p>
         <form method="post">
             {% csrf_token %}
             {{ form.non_field_errors }}

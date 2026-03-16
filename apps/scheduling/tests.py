@@ -51,6 +51,12 @@ class PublicBookingFlowTests(TestCase):
             phone="0900111222",
             role=UserRole.DOCTOR,
         )
+        self.second_doctor = CustomUser.objects.create_user(
+            username="doctor-public-2",
+            password="secret123",
+            phone="0900111223",
+            role=UserRole.DOCTOR,
+        )
 
     def test_public_booking_page_is_accessible_without_login(self):
         response = self.client.get(reverse("public-booking"))
@@ -109,6 +115,133 @@ class PublicBookingFlowTests(TestCase):
         patient = Patient.objects.get(phone="0900555666")
         self.assertIsNotNone(patient.user)
         self.assertEqual(patient.user.phone, "0900555666")
+
+    def test_public_booking_rejects_invalid_phone(self):
+        response = self.client.post(
+            reverse("public-booking"),
+            {
+                "full_name": "A",
+                "phone": "12345",
+                "doctor": self.doctor.pk,
+                "date": "2099-03-25",
+                "time_slot": "09:00",
+                "reason": "",
+                "notes": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Số điện thoại không hợp lệ")
+        self.assertFalse(Patient.objects.filter(phone="12345").exists())
+
+    def test_public_booking_rejects_past_date(self):
+        response = self.client.post(
+            reverse("public-booking"),
+            {
+                "full_name": "Public Patient",
+                "phone": "0900666777",
+                "doctor": self.doctor.pk,
+                "date": "2000-01-01",
+                "time_slot": "09:00",
+                "reason": "",
+                "notes": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Không thể đặt lịch cho ngày trong quá khứ.")
+
+    def test_public_booking_rejects_invalid_time_slot(self):
+        response = self.client.post(
+            reverse("public-booking"),
+            {
+                "full_name": "Public Patient",
+                "phone": "0900666888",
+                "doctor": self.doctor.pk,
+                "date": "2099-03-25",
+                "time_slot": "12:15",
+                "reason": "",
+                "notes": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Khung giờ đã chọn không hợp lệ.")
+
+    def test_public_booking_rejects_taken_slot(self):
+        Appointment.objects.create(
+            patient=Patient.objects.create(full_name="Existing Patient", phone="0900777888"),
+            doctor=self.doctor,
+            date=date(2099, 3, 25),
+            time_slot=time(9, 0),
+            status=AppointmentStatus.CONFIRMED,
+        )
+
+        response = self.client.post(
+            reverse("public-booking"),
+            {
+                "full_name": "Public Patient",
+                "phone": "0900666999",
+                "doctor": self.doctor.pk,
+                "date": "2099-03-25",
+                "time_slot": "09:00",
+                "reason": "",
+                "notes": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Khung giờ này đã có người đặt. Vui lòng chọn giờ khác.")
+
+    def test_public_booking_with_any_doctor_assigns_available_doctor(self):
+        response = self.client.post(
+            reverse("public-booking"),
+            {
+                "full_name": "Public Patient",
+                "phone": "0900123456",
+                "doctor": "",
+                "date": "2099-03-25",
+                "time_slot": "09:30",
+                "reason": "Khám tổng quát",
+                "notes": "",
+            },
+        )
+
+        self.assertRedirects(response, reverse("booking-success"))
+        appointment = Appointment.objects.get(patient__phone="0900123456")
+        self.assertIn(appointment.doctor, [self.doctor, self.second_doctor])
+
+    def test_public_booking_with_any_doctor_rejects_when_all_doctors_busy(self):
+        Appointment.objects.create(
+            patient=Patient.objects.create(full_name="Existing Patient One", phone="0900777001"),
+            doctor=self.doctor,
+            date=date(2099, 3, 25),
+            time_slot=time(9, 0),
+            status=AppointmentStatus.CONFIRMED,
+        )
+        Appointment.objects.create(
+            patient=Patient.objects.create(full_name="Existing Patient Two", phone="0900777002"),
+            doctor=self.second_doctor,
+            date=date(2099, 3, 25),
+            time_slot=time(9, 0),
+            status=AppointmentStatus.CONFIRMED,
+        )
+
+        response = self.client.post(
+            reverse("public-booking"),
+            {
+                "full_name": "Public Patient",
+                "phone": "0900123999",
+                "doctor": "",
+                "date": "2099-03-25",
+                "time_slot": "09:00",
+                "reason": "",
+                "notes": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Khung giờ này hiện không còn bác sĩ trống. Vui lòng chọn giờ khác.")
 
 
 class AppointmentDetailViewTests(TestCase):

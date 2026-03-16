@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency %}
 
 {% block title %}Lịch hẹn{% endblock %}
 
@@ -28,8 +29,8 @@
                     <tr class="table-row">
                         <td><a href="{% url 'appointment-detail' appointment.pk %}">{{ appointment.patient.full_name }}</a></td>
                         <td>{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</td>
-                        <td>{{ appointment.date }}</td>
-                        <td>{{ appointment.time_slot|time:"H:i" }}</td>
+                        <td>{{ appointment.date|vi_date }}</td>
+                        <td>{{ appointment.time_slot|vi_time }}</td>
                         <td>{{ appointment.get_status_display }}</td>
                         <td class="text-right">
                             <div class="row-actions">

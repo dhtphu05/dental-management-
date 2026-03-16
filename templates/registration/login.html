@@ -5,18 +5,43 @@
 {% block content %}
 <div class="mx-auto max-w-md">
     <div class="hero-panel fade-in">
-        <div class="mb-6">
+        <div class="mb-8">
             <span class="badge-soft mb-3">Đăng nhập hệ thống</span>
             <h1 class="mb-2">Đăng nhập</h1>
             <p class="section-subtitle">Bệnh nhân đăng nhập bằng số điện thoại. Quản trị viên, lễ tân và bác sĩ đăng nhập bằng username.</p>
         </div>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="space-y-4">
-                        {{ form.as_p }}
-                    </div>
-                    <button class="btn-primary mt-5 w-full" type="submit"><i data-lucide="log-in" class="icon-sm"></i>Đăng nhập</button>
-                </form>
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="rounded-[24px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ form.username.id_for_label }}">
+                    {{ form.username.label }}
+                </label>
+                {{ form.username }}
+                {% for error in form.username.errors %}
+                    <div class="text-sm font-medium text-rose-600">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ form.password.id_for_label }}">
+                    {{ form.password.label }}
+                </label>
+                {{ form.password }}
+                {% for error in form.password.errors %}
+                    <div class="text-sm font-medium text-rose-600">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <button class="btn-primary mt-2 w-full !justify-center !rounded-[1.4rem] !py-4 !text-lg" type="submit">
+                <i data-lucide="log-in" class="icon-sm"></i>Đăng nhập
+            </button>
+        </form>
     </div>
 </div>
 {% endblock %}

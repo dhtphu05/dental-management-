@@ -40,6 +40,18 @@ def attach_record_payload(appointments):
     return payload
 
 
+class LandingPageView(TemplateView):
+    template_name = "landing_page.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["doctor_count"] = CustomUser.objects.filter(role=UserRole.DOCTOR).count()
+        context["service_count"] = Service.objects.count()
+        context["patient_count"] = Patient.objects.count()
+        context["featured_services"] = Service.objects.order_by("name")[:4]
+        return context
+
+
 class DashboardView(RoleRequiredMixin, TemplateView):
     allowed_roles = (UserRole.ADMIN, UserRole.RECEPTIONIST, UserRole.DOCTOR, UserRole.PATIENT)
     template_name = "dashboard.html"

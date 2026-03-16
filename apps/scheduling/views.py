@@ -37,9 +37,13 @@ class BookingSlotMixin:
         return lookup
 
     def get_booking_context(self):
+        doctor_ids = list(
+            PublicBookingForm.base_fields["doctor"].queryset.values_list("id", flat=True)
+        )
         return {
             "slot_times": [slot.strftime("%H:%M") for slot in self.SLOT_TIMES],
             "booked_slots": self.get_booked_slots_lookup(),
+            "doctor_ids": [str(doctor_id) for doctor_id in doctor_ids],
             "today": date.today().isoformat(),
             "booking_steps": [
                 {"number": 1, "title": "Thông tin", "description": "Khách hàng"},

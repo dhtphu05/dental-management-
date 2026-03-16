@@ -50,8 +50,8 @@ class CrudViewSmokeTests(TestCase):
             {
                 "name": "Cao voi",
                 "price": "200000.00",
-                "estimated_duration": "00:30:00",
-                "description": "Lam sach",
+                "duration_minutes": "30",
+                "description": "Làm sạch mảng bám và đánh bóng răng.",
             },
         )
 
@@ -81,6 +81,46 @@ class CrudViewSmokeTests(TestCase):
         self.assertRedirects(response, reverse("invoice-list"))
         invoice.refresh_from_db()
         self.assertEqual(invoice.status, "paid")
+
+    def test_invoice_detail_view_renders_structured_sections(self):
+        patient = Patient.objects.create(full_name="Patient Invoice", phone="0900555555")
+        service = Service.objects.create(
+            name="Tẩy trắng răng",
+            price=Decimal("1200000.00"),
+            estimated_duration=timedelta(minutes=90),
+        )
+        appointment = Appointment.objects.create(
+            patient=patient,
+            doctor=self.doctor,
+            date=date(2026, 3, 24),
+            time_slot=time(15, 0),
+            status=AppointmentStatus.CONFIRMED,
+        )
+        plan = TreatmentPlan.objects.create(
+            appointment=appointment,
+            diagnosis="Nhiễm màu răng cửa",
+            status=TreatmentPlanStatus.COMPLETED,
+        )
+        plan.services.add(service)
+        invoice = Invoice.objects.get(treatment_plan=plan)
+
+        response = self.client.get(reverse("invoice-detail", args=[invoice.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Chi tiết dịch vụ")
+        self.assertContains(response, "Hồ sơ điều trị liên quan")
+        self.assertContains(response, "Tẩy trắng răng")
+        self.assertContains(response, "1.200.000 VNĐ")
+
+
+class LandingPageTests(TestCase):
+    def test_homepage_is_public_and_has_booking_and_login_actions(self):
+        response = self.client.get(reverse("home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Phòng khám Thiên Phú")
+        self.assertContains(response, reverse("public-booking"))
+        self.assertContains(response, reverse("login"))
 
 
 class MixedAuthenticationTests(TestCase):

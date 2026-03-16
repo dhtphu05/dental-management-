@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency %}
 
 {% block title %}Chi tiết hóa đơn{% endblock %}
 
@@ -6,14 +7,120 @@
 <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
     <div>
         <h1 class="mb-2">Hóa đơn #{{ invoice.pk }}</h1>
-        <p class="section-subtitle">{{ invoice.treatment_plan.appointment.patient.full_name }}</p>
+        <p class="section-subtitle">Chi tiết thanh toán cho hồ sơ điều trị của {{ invoice.treatment_plan.appointment.patient.full_name }}.</p>
     </div>
-    <a class="btn-secondary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>
+    <div class="flex flex-wrap gap-3">
+        <a class="btn-secondary" href="{% url 'appointment-detail' invoice.treatment_plan.appointment.pk %}"><i data-lucide="calendar-fold" class="icon-sm"></i>Xem lịch hẹn</a>
+        <a class="btn-primary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Cập nhật hóa đơn</a>
+    </div>
 </div>
-<div class="surface-card fade-in">
-    <p><strong>Bác sĩ:</strong> {{ invoice.treatment_plan.appointment.doctor.get_full_name|default:invoice.treatment_plan.appointment.doctor.username }}</p>
-    <p><strong>Ngày phát hành:</strong> {{ invoice.issued_at }}</p>
-    <p><strong>Trạng thái:</strong> {{ invoice.get_status_display }}</p>
-    <p><strong>Tổng tiền:</strong> {{ invoice.total_amount }}</p>
-</div>
+
+<section class="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+    <div class="space-y-6">
+        <div class="hero-panel fade-in">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-brand-700)]">Tổng thanh toán</p>
+                    <div class="text-4xl font-extrabold text-[var(--color-ink-900)]">{{ invoice.total_amount|vnd }}</div>
+                    <p class="mt-3 text-[var(--color-ink-600)]">Ngày phát hành {{ invoice.issued_at|vi_datetime }}</p>
+                </div>
+                <span class="badge-soft">{{ invoice.get_status_display }}</span>
+            </div>
+        </div>
+
+        <div class="surface-card fade-in-delay-1">
+            <div class="mb-4 flex items-center justify-between gap-4">
+                <h2 class="section-title !text-xl">Thông tin hóa đơn</h2>
+                <div class="doctor-stat-icon"><i data-lucide="receipt-text" class="icon-md"></i></div>
+            </div>
+            <div class="space-y-4">
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Mã hóa đơn</span><span class="font-semibold text-[var(--color-ink-900)]">#{{ invoice.pk }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Trạng thái</span><span class="badge-soft">{{ invoice.get_status_display }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Ngày phát hành</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.issued_at|vi_datetime }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Cập nhật gần nhất</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.updated_at|vi_datetime }}</span></div>
+            </div>
+        </div>
+
+        <div class="surface-card fade-in-delay-1">
+            <div class="mb-4 flex items-center justify-between gap-4">
+                <h2 class="section-title !text-xl">Thông tin tiếp nhận</h2>
+                <div class="doctor-stat-icon"><i data-lucide="clipboard-plus" class="icon-md"></i></div>
+            </div>
+            <div class="space-y-4">
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Bệnh nhân</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.treatment_plan.appointment.patient.full_name }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Số điện thoại</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.treatment_plan.appointment.patient.phone }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Bác sĩ</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.treatment_plan.appointment.doctor.get_full_name|default:invoice.treatment_plan.appointment.doctor.username }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Lịch hẹn</span><span class="font-semibold text-[var(--color-brand-700)]">{{ invoice.treatment_plan.appointment.date|vi_date_long }} lúc {{ invoice.treatment_plan.appointment.time_slot|vi_time }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <div class="surface-card fade-in">
+            <div class="mb-4 flex items-center justify-between gap-4">
+                <div>
+                    <h2 class="section-title !text-xl">Chi tiết dịch vụ</h2>
+                    <p class="section-subtitle">Danh sách dịch vụ đã tính vào hóa đơn hiện tại.</p>
+                </div>
+                <div class="doctor-stat-icon"><i data-lucide="stethoscope" class="icon-md"></i></div>
+            </div>
+
+            {% with services=invoice.treatment_plan.services.all %}
+                {% if services %}
+                    <div class="space-y-3">
+                        {% for service in services %}
+                            <article class="rounded-[28px] bg-slate-50 px-5 py-5">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <h3 class="mb-1 text-lg font-semibold text-[var(--color-ink-900)]">{{ service.name }}</h3>
+                                        <p class="text-sm text-[var(--color-ink-500)]">{{ service.description|default:"Dịch vụ được thực hiện theo chỉ định trong hồ sơ điều trị." }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-bold text-[var(--color-brand-700)]">{{ service.price|vnd }}</div>
+                                        <div class="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-[var(--color-ink-500)]">{{ service.estimated_duration|duration_vi }}</div>
+                                    </div>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="rounded-[24px] bg-slate-50 px-4 py-5 text-[var(--color-ink-500)]">Chưa có dịch vụ nào được gắn với hóa đơn này.</div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="surface-card fade-in-delay-1">
+            <div class="mb-4 flex items-center justify-between gap-4">
+                <div>
+                    <h2 class="section-title !text-xl">Hồ sơ điều trị liên quan</h2>
+                    <p class="section-subtitle">Tóm tắt chẩn đoán và răng được ghi nhận trong liệu trình.</p>
+                </div>
+                <div class="doctor-stat-icon"><i data-lucide="files" class="icon-md"></i></div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Chẩn đoán</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.treatment_plan.diagnosis|default:"-" }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Ghi chú</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.treatment_plan.notes|default:"-" }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Trạng thái liệu trình</span><span class="badge-soft">{{ invoice.treatment_plan.get_status_display }}</span></div>
+            </div>
+
+            <div class="mt-5">
+                <h3 class="mb-3">Răng liên quan</h3>
+                {% with teeth=invoice.treatment_plan.teeth.all %}
+                    {% if teeth %}
+                        <div class="flex flex-wrap gap-3">
+                            {% for tooth in teeth %}
+                                <div class="rounded-[24px] bg-[var(--color-brand-50)] px-4 py-3 text-sm font-semibold text-[var(--color-brand-700)]">
+                                    Răng {{ tooth.tooth_number }} · {{ tooth.get_status_display }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="rounded-[24px] bg-slate-50 px-4 py-4 text-[var(--color-ink-500)]">Chưa có răng nào được ghi nhận trong liệu trình này.</div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

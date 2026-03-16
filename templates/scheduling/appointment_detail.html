@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency %}
 
 {% block title %}Chi tiết lịch hẹn{% endblock %}
 
@@ -6,7 +7,7 @@
 <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
     <div>
         <h1 class="mb-2">{{ appointment.patient.full_name }}</h1>
-        <p class="section-subtitle">{{ appointment.date }} {{ appointment.time_slot|time:"H:i" }}</p>
+        <p class="section-subtitle">{{ appointment.date|vi_date_long }} lúc {{ appointment.time_slot|vi_time }}</p>
     </div>
     <div class="flex flex-wrap gap-3">
         <a class="btn-secondary" href="{% url 'appointment-update' appointment.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>

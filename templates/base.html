@@ -86,28 +86,93 @@
         select,
         textarea {
             width: 100%;
-            border: 0;
-            border-radius: 1rem;
-            background: rgba(255, 255, 255, 0.92);
-            padding: 0.8rem 1rem;
+            min-height: 3.9rem;
+            box-sizing: border-box;
+            border: 1px solid rgba(203, 213, 225, 0.9);
+            border-radius: 1.45rem;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+            padding: 1rem 1.55rem;
             color: var(--color-ink-900);
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+            font: inherit;
+            font-size: 1rem;
+            line-height: 1.35;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
             outline: none;
-            border: 1px solid rgba(203, 213, 225, 0.8);
-            transition: 0.2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+            background-clip: padding-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
         }
 
         input:focus,
         select:focus,
         textarea:focus {
-            border-color: rgba(33, 150, 243, 0.55);
-            box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.12);
+            border-color: rgba(33, 150, 243, 0.72);
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.12), 0 14px 32px rgba(33, 150, 243, 0.08);
+            transform: translateY(-1px);
         }
 
         input[type="checkbox"] {
             width: 1.15rem;
             height: 1.15rem;
             accent-color: var(--color-brand-500);
+            box-shadow: none;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #94a3b8;
+            opacity: 1;
+        }
+
+        input[type="date"],
+        input[type="time"] {
+            padding-right: 1.35rem;
+        }
+
+        input[type="date"]::-webkit-date-and-time-value,
+        input[type="time"]::-webkit-date-and-time-value {
+            text-align: left;
+        }
+
+        select {
+            padding-left: 1.55rem;
+            padding-right: 3.2rem;
+            background-image:
+                linear-gradient(45deg, transparent 50%, #64748b 50%),
+                linear-gradient(135deg, #64748b 50%, transparent 50%);
+            background-position:
+                calc(100% - 24px) calc(50% - 2px),
+                calc(100% - 18px) calc(50% - 2px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+        }
+
+        textarea {
+            min-height: 8.5rem;
+            padding-top: 1.15rem;
+            padding-bottom: 1.15rem;
+            resize: vertical;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="search"],
+        input[type="number"] {
+            text-indent: 0;
+            padding-left: 1.55rem;
+            padding-right: 1.55rem;
+        }
+
+        input:disabled,
+        select:disabled,
+        textarea:disabled {
+            background: #f1f5f9;
+            color: #64748b;
+            cursor: not-allowed;
             box-shadow: none;
         }
 
@@ -759,7 +824,7 @@
 <body>
     <header class="app-shell pb-0">
         <nav class="topbar fade-in">
-            <a class="brand-block flex min-w-0 items-center gap-4" href="{% url 'dashboard' %}">
+            <a class="brand-block flex min-w-0 items-center gap-4" href="{% if request.user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}">
                 <span class="brand-mark">DN</span>
                 <span class="brand-copy">
                     <span class="brand-title">Nha khoa Dental Project</span>
@@ -778,6 +843,13 @@
                 <div class="nav-links">
                     <a class="nav-link" href="{% url 'dashboard' %}"><i data-lucide="layout-dashboard" class="icon-sm"></i>Bảng điều khiển</a>
                     <a class="nav-link" href="{% url 'patient-history' %}"><i data-lucide="files" class="icon-sm"></i>Lịch sử khám</a>
+                </div>
+            {% else %}
+                <div class="nav-links">
+                    <a class="nav-link" href="{% url 'home' %}#gioi-thieu"><i data-lucide="sparkles" class="icon-sm"></i>Giới thiệu</a>
+                    <a class="nav-link" href="{% url 'home' %}#dich-vu"><i data-lucide="stethoscope" class="icon-sm"></i>Dịch vụ</a>
+                    <a class="nav-link" href="{% url 'home' %}#quy-trinh"><i data-lucide="calendar-check-2" class="icon-sm"></i>Quy trình</a>
+                    <a class="nav-link" href="{% url 'home' %}#lien-he"><i data-lucide="map-pinned" class="icon-sm"></i>Liên hệ</a>
                 </div>
             {% endif %}
             <div class="topbar-actions">

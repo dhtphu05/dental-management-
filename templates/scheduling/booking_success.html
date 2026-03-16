@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency %}
 
 {% block title %}Đặt lịch thành công{% endblock %}
 
@@ -16,7 +17,7 @@
             <div class="summary-row"><span class="text-ink-500">Bệnh nhân</span><span class="font-semibold text-ink-900">{{ appointment.patient.full_name }}</span></div>
             <div class="summary-row"><span class="text-ink-500">Số điện thoại</span><span class="font-semibold text-ink-900">{{ appointment.patient.phone }}</span></div>
             <div class="summary-row"><span class="text-ink-500">Bác sĩ</span><span class="font-semibold text-ink-900">{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</span></div>
-            <div class="summary-row"><span class="text-ink-500">Ngày giờ</span><span class="font-semibold text-brand-700">{{ appointment.date }} - {{ appointment.time_slot|time:"H:i" }}</span></div>
+            <div class="summary-row"><span class="text-ink-500">Ngày giờ</span><span class="font-semibold text-brand-700">{{ appointment.date|vi_date_long }} - {{ appointment.time_slot|vi_time }}</span></div>
         </div>
     </section>
 

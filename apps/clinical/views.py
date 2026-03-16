@@ -28,6 +28,8 @@ class ServiceCreateView(ServiceAccessMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_title"] = "Thêm dịch vụ"
+        context["page_subtitle"] = "Thiết lập tên dịch vụ, đơn giá và thời gian thực hiện theo cách bệnh nhân dễ hiểu."
+        context["form_variant"] = "service"
         return context
 
 
@@ -40,6 +42,8 @@ class ServiceUpdateView(ServiceAccessMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_title"] = "Cập nhật dịch vụ"
+        context["page_subtitle"] = "Điều chỉnh thông tin dịch vụ đang áp dụng tại phòng khám."
+        context["form_variant"] = "service"
         return context
 
 
