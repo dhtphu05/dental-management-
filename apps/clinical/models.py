@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -27,6 +28,7 @@ class Tooth(models.Model):
     tooth_number = models.IntegerField()
     status = models.CharField(max_length=20, choices=ToothStatus.choices, default=ToothStatus.NORMAL)
     notes = models.CharField(max_length=255, blank=True)
+    last_updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_teeth")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

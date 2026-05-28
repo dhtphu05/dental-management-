@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.db.models import Sum
 from django.contrib.auth import login
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView, TemplateView
 
@@ -234,13 +234,18 @@ class PatientAppointmentDetailView(RoleRequiredMixin, DetailView):
 
 
 class PatientTeethView(RoleRequiredMixin, TemplateView):
-    allowed_roles = (UserRole.PATIENT,)
+    allowed_roles = (UserRole.PATIENT, UserRole.DOCTOR, UserRole.RECEPTIONIST, UserRole.ADMIN)
     template_name = "accounts/patient_teeth.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        patient = self.request.user.patient_profile
-        teeth = patient.teeth.all()
+        if self.request.user.role == UserRole.PATIENT:
+            patient = self.request.user.patient_profile
+        else:
+            patient_id = self.request.GET.get("patient_id")
+            patient = get_object_or_404(Patient, pk=patient_id)
+            
+        teeth = patient.teeth.select_related('last_updated_by').all()
         context["patient"] = patient
         context["odontogram_sections"] = build_odontogram_sections(patient)
         context["tooth_status_summary"] = [

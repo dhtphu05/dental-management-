@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<!-- FullCalendar CSS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<style>
+  /* Customizing FullCalendar to fit the design system */
+  .fc {
+    font-family: inherit;
+    --fc-border-color: #e2e8f0;
+    --fc-button-bg-color: #fff;
+    --fc-button-border-color: #cbd5e1;
+    --fc-button-text-color: #334155;
+    --fc-button-hover-bg-color: #f8fafc;
+    --fc-button-hover-border-color: #94a3b8;
+    --fc-button-active-bg-color: #f1f5f9;
+    --fc-button-active-border-color: #64748b;
+    --fc-event-bg-color: #3b82f6;
+    --fc-event-border-color: #3b82f6;
+    --fc-today-bg-color: #f0f9ff;
+  }
+  
+  .fc .fc-button-primary {
+    background-color: var(--fc-button-bg-color);
+    border-color: var(--fc-button-border-color);
+    color: var(--fc-button-text-color);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    text-transform: capitalize;
+  }
+  
+  .fc .fc-button-primary:not(:disabled):active,
+  .fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: var(--fc-button-active-bg-color);
+    border-color: var(--fc-button-active-border-color);
+    color: #0f172a;
+  }
+  
+  .fc .fc-button-primary:hover {
+    background-color: var(--fc-button-hover-bg-color);
+    border-color: var(--fc-button-hover-border-color);
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .fc-event {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 0.85rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  #calendar {
+    min-height: 700px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+  <div class="flex flex-col items-start justify-between sm:flex-row sm:items-center mb-8 gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+        <i data-lucide="calendar" class="h-6 w-6 text-primary-500"></i>
+        Lịch biểu bác sĩ
+      </h1>
+      <p class="mt-1 text-sm text-slate-500">Xem lịch khám và xếp lịch làm việc trực quan.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      {% if request.user.role != 'doctor' %}
+      <div class="relative">
+        <select id="doctor-filter" class="form-input py-2 pl-3 pr-10 min-w-[200px]">
+          <option value="">Tất cả bác sĩ</option>
+          {% for doc in doctor_options %}
+          <option value="{{ doc.pk }}">{{ doc.first_name }} {{ doc.last_name }}</option>
+          {% endfor %}
+        </select>
+        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none"></i>
+      </div>
+      {% endif %}
+      <a href="javascript:void(0)" onclick="openCreateDrawer()" class="btn btn-primary shadow-sm hover:shadow-md transition-shadow">
+        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Thêm lịch hẹn
+      </a>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <div id="calendar"></div>
+  </div>
+</div>
+
+
+<!-- Create Appointment Drawer (Sidebar) -->
+<div id="create-drawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto flex flex-col hidden">
+  <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 relative shrink-0">
+    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+      <i data-lucide="calendar-plus" class="h-5 w-5 text-primary-500"></i>
+      Thêm lịch hẹn
+    </h2>
+    <button type="button" onclick="closeCreateDrawer()" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500 transition-colors">
+      <i data-lucide="x" class="h-5 w-5"></i>
+    </button>
+  </div>
+  <div class="p-6 overflow-y-auto grow">
+    <form id="drawer-form" onsubmit="submitAppointmentForm(event)">
+      <div id="drawer-errors" class="mb-4 rounded-xl bg-rose-50 p-3 text-sm font-medium text-rose-700 hidden"></div>
+      
+      <div class="grid gap-5">
+        {% for field in form %}
+            <div>
+                <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="[&>input]:form-input [&>select]:form-select [&>textarea]:form-textarea w-full">
+                  {{ field }}
+                </div>
+                {% if field.help_text %}<div class="mt-1 text-xs text-[var(--color-ink-500)]">{{ field.help_text }}</div>{% endif %}
+            </div>
+        {% endfor %}
+      </div>
+      
+      <div class="mt-8 flex gap-3">
+        <button type="submit" class="btn btn-primary w-full flex justify-center items-center gap-2">
+          <i data-lucide="save" class="h-4 w-4"></i> Lưu lịch hẹn
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- End Drawer -->
+
+<!-- Modal for Event Details (Tailwind styled) -->
+<div id="event-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300 pointer-events-auto" id="event-modal-content">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <h3 class="text-lg font-semibold text-slate-900 flex items-center gap-2" id="modal-title">
+        <i data-lucide="calendar-check" class="h-5 w-5 text-primary-500"></i>
+        Chi tiết lịch hẹn
+      </h3>
+      <button type="button" class="text-slate-400 hover:text-slate-600 transition-colors" onclick="closeEventModal()">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="flex items-start gap-3">
+        <i data-lucide="user" class="h-5 w-5 text-slate-400 mt-0.5"></i>
+        <div>
+          <p class="text-sm font-medium text-slate-900">Bệnh nhân</p>
+          <p class="text-sm text-slate-600" id="modal-patient"></p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <i data-lucide="stethoscope" class="h-5 w-5 text-slate-400 mt-0.5"></i>
+        <div>
+          <p class="text-sm font-medium text-slate-900">Bác sĩ</p>
+          <p class="text-sm text-slate-600" id="modal-doctor"></p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <i data-lucide="clock" class="h-5 w-5 text-slate-400 mt-0.5"></i>
+        <div>
+          <p class="text-sm font-medium text-slate-900">Thời gian</p>
+          <p class="text-sm text-slate-600" id="modal-time"></p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <i data-lucide="info" class="h-5 w-5 text-slate-400 mt-0.5"></i>
+        <div>
+          <p class="text-sm font-medium text-slate-900">Trạng thái</p>
+          <p class="text-sm text-slate-600" id="modal-status"></p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <i data-lucide="file-text" class="h-5 w-5 text-slate-400 mt-0.5"></i>
+        <div>
+          <p class="text-sm font-medium text-slate-900">Lý do/Ghi chú</p>
+          <p class="text-sm text-slate-600" id="modal-reason"></p>
+        </div>
+      </div>
+    </div>
+    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3 rounded-b-xl">
+      <button type="button" class="btn btn-secondary bg-white" onclick="closeEventModal()">Đóng</button>
+      <a href="#" id="modal-link" class="btn btn-primary">Xem chi tiết</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  let calendar;
+
+  function openCreateDrawer(dateStr = '', timeStr = '') {
+    const drawer = document.getElementById('create-drawer');
+    drawer.classList.remove('hidden');
+    // small timeout for transition
+    setTimeout(() => {
+      drawer.classList.remove('translate-x-full');
+    }, 10);
+    
+    // Auto-fill dates if provided
+    if (dateStr) {
+      const dateInput = document.querySelector('input[type="date"][name="date"]');
+      if (dateInput) dateInput.value = dateStr;
+    }
+    if (timeStr) {
+      const timeInput = document.querySelector('input[type="time"][name="time_slot"]');
+      if (timeInput) timeInput.value = timeStr;
+    }
+    lucide.createIcons();
+  }
+
+  function closeCreateDrawer() {
+    const drawer = document.getElementById('create-drawer');
+    drawer.classList.add('translate-x-full');
+    setTimeout(() => {
+      drawer.classList.add('hidden');
+    }, 300);
+  }
+
+  
+  // Patient auto-search logic
+  document.addEventListener('DOMContentLoaded', function() {
+    const phoneInput = document.querySelector('input[name="phone"]');
+    if (phoneInput) {
+      // Add search button inline next to input
+      const container = phoneInput.parentElement;
+      container.classList.add('relative');
+      
+      const searchBtn = document.createElement('button');
+      searchBtn.type = 'button';
+      searchBtn.className = 'absolute right-2 top-1/2 -translate-y-1/2 text-primary-500 hover:text-primary-700 bg-white p-1 rounded font-semibold text-xs';
+      searchBtn.innerHTML = '<i data-lucide="search" class="w-4 h-4 inline-block"></i> Tìm';
+      
+      let parentHTML = phoneInput.outerHTML;
+      phoneInput.outerHTML = '<div class="flex gap-2 relative w-full">' + parentHTML.replace(/class="/, 'class="w-full ') + '</div>';
+      
+      // we need to reselect after outerHTML
+      const newPhoneInput = document.querySelector('input[name="phone"]');
+      const innerContainer = newPhoneInput.parentElement;
+      innerContainer.appendChild(searchBtn);
+      
+      // Also add a little status text
+      const statusText = document.createElement('div');
+      statusText.className = 'text-xs mt-1 min-h-[20px]';
+      innerContainer.parentElement.appendChild(statusText);
+
+      function performSearch() {
+        const phone = newPhoneInput.value.trim();
+        if (phone.length < 9) return;
+        
+        statusText.innerHTML = '<span class="text-slate-500">Đang tìm kiếm...</span>';
+        
+        // Search API call
+        fetch(`{% url 'api-patient-search' %}?phone=${phone}`)
+          .then(res => res.json())
+          .then(data => {
+            const nameInput = document.querySelector('input[name="full_name"]');
+            if (data.status === 'success') {
+              statusText.innerHTML = '<span class="text-emerald-600 font-medium"><i data-lucide="check-circle" class="w-3 h-3 inline-block mr-1"></i>Đã tìm thấy Bệnh nhân cũ</span>';
+              if (nameInput) {
+                nameInput.value = data.data.full_name;
+                nameInput.classList.add('bg-emerald-50');
+                setTimeout(() => nameInput.classList.remove('bg-emerald-50'), 1000);
+              }
+            } else if (data.status === 'not_found') {
+              statusText.innerHTML = '<span class="text-primary-600 font-medium"><i data-lucide="info" class="w-3 h-3 inline-block mr-1"></i>Bệnh nhân mới. Hãy nhập tên.</span>';
+              if (nameInput && !nameInput.value) {
+                nameInput.focus();
+              }
+            } else {
+              statusText.innerHTML = `<span class="text-rose-600">${data.message || 'Lỗi tìm kiếm'}</span>`;
+            }
+            lucide.createIcons();
+          })
+          .catch(err => {
+            statusText.innerHTML = '<span class="text-rose-600">Lỗi kết nối</span>';
+          });
+      }
+
+      searchBtn.addEventListener('click', performSearch);
+      
+      // also search on blur if they typed something
+      newPhoneInput.addEventListener('blur', function() {
+         if (newPhoneInput.value.trim().length >= 9) performSearch();
+      });
+      
+      // Enter key on phone prevents submit and triggers search
+      newPhoneInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          performSearch();
+        }
+      });
+    }
+  });
+
+  function submitAppointmentForm(event) {
+    event.preventDefault();
+    const form = document.getElementById('drawer-form');
+    const errBox = document.getElementById('drawer-errors');
+    errBox.classList.add('hidden');
+    errBox.innerHTML = '';
+    
+    const formData = new FormData(form);
+    
+    fetch("{% url 'api-appointment-create' %}", {
+      method: "POST",
+      body: formData,
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        closeCreateDrawer();
+        form.reset();
+        calendar.refetchEvents();
+      } else {
+        let errHtml = '';
+        for (const [key, msgs] of Object.entries(data.errors)) {
+          errHtml += `<div><strong>${key}</strong>: ${msgs.join(', ')}</div>`;
+        }
+        errBox.innerHTML = errHtml;
+        errBox.classList.remove('hidden');
+      }
+    })
+    .catch(err => {
+      errBox.innerHTML = "Có lỗi xảy ra. Hãy kiểm tra lại kết nối.";
+      errBox.classList.remove('hidden');
+    });
+  }
+
+  
+  function openEventModal(info) {
+    const props = info.event.extendedProps;
+    document.getElementById('modal-patient').textContent = props.patient_name;
+    document.getElementById('modal-doctor').textContent = props.doctor_name;
+    document.getElementById('modal-time').textContent = info.event.start.toLocaleString('vi-VN');
+    document.getElementById('modal-status').textContent = props.status;
+    document.getElementById('modal-reason').textContent = props.reason || 'Không có ghi chú';
+    document.getElementById('modal-link').href = props.url;
+    
+    // Animate open
+    const modal = document.getElementById('event-modal');
+    const content = document.getElementById('event-modal-content');
+    
+    modal.classList.remove('hidden');
+    // Force reflow
+    void modal.offsetWidth;
+    modal.classList.remove('opacity-0');
+    modal.classList.add('opacity-100');
+    
+    content.classList.remove('scale-95');
+    content.classList.add('scale-100');
+    
+    // Re-initialize lucide icons inside modal if needed
+    lucide.createIcons();
+  }
+  
+  function closeEventModal() {
+    const modal = document.getElementById('event-modal');
+    const content = document.getElementById('event-modal-content');
+    
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    
+    content.classList.remove('scale-100');
+    content.classList.add('scale-95');
+    
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 300);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'timeGridWeek',
+      locale: 'vi',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'timeGridWeek,timeGridDay,listWeek'
+      },
+      buttonText: {
+        today: 'Hôm nay',
+        month: 'Tháng',
+        week: 'Tuần',
+        day: 'Ngày',
+        list: 'Danh sách'
+      },
+      allDaySlot: false,
+      slotMinTime: '08:00:00',
+            slotMaxTime: '20:00:00',
+      expandRows: true,
+      height: 800,
+      selectable: true,
+                  select: function(info) {
+        let dateStr = info.startStr.split('T')[0];
+        let timeStr = info.startStr.includes('T') ? info.startStr.split('T')[1].substring(0, 5) : "";
+        openCreateDrawer(dateStr, timeStr);
+      },
+      eventClick: function(info) {
+        openEventModal(info);
+      },
+      events: function(fetchInfo, successCallback, failureCallback) {
+        let url = "{% url 'api-appointment-events' %}";
+        let doctorFilter = document.getElementById('doctor-filter');
+        if (doctorFilter && doctorFilter.value) {
+            url += "?doctor_id=" + doctorFilter.value;
+        }
+        
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            successCallback(data);
+          })
+          .catch(error => {
+            console.error('Error fetching events:', error);
+            failureCallback(error);
+          });
+      }
+    });
+    
+    calendar.render();
+    
+    // Handle filter change
+    const doctorFilter = document.getElementById('doctor-filter');
+    if (doctorFilter) {
+        doctorFilter.addEventListener('change', function() {
+            calendar.refetchEvents();
+        });
+    }
+    
+    // Close modal on click outside
+    document.getElementById('event-modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeEventModal();
+      }
+    });
+  });
+</script>
+{% endblock %}

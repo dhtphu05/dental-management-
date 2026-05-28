@@ -5,12 +5,12 @@ from django.shortcuts import redirect
 from django.http import QueryDict
 from django.db.models import Q
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, UpdateView, TemplateView
 
 from apps.accounts.mixins import RoleRequiredMixin
 from apps.accounts.models import CustomUser, UserRole
 from apps.scheduling.account_forms import BookingAccountCreateForm
-from apps.scheduling.forms import AppointmentForm, PublicBookingForm
+from apps.scheduling.forms import AppointmentForm, SidebarAppointmentForm, PublicBookingForm
 from apps.scheduling.models import Appointment, AppointmentStatus
 
 
@@ -248,35 +248,20 @@ class AppointmentCreateView(AppointmentAccessMixin, CreateView):
     template_name = "shared/form.html"
     success_url = reverse_lazy("appointment-list")
 
+    def get_initial(self):
+        initial = super().get_initial()
+        # Parse query params like ?date=2026-05-28&time=14:30
+        if self.request.GET.get('date'):
+            initial['date'] = self.request.GET.get('date')
+        if self.request.GET.get('time'):
+            # Convert simple time string if needed, or stick to what the form expects
+            initial['time_slot'] = self.request.GET.get('time')
+        return initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_title"] = "Thêm lịch hẹn"
         return context
-
-    def get_initial(self):
-        initial = super().get_initial()
-        initial["date"] = date.today().isoformat()
-        patient_id = self.request.GET.get("patient")
-        if patient_id:
-            initial["patient"] = patient_id
-        return initial
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        if self.request.method == "GET" and self.request.GET:
-            data = QueryDict("", mutable=True)
-            for field in ["patient", "doctor", "date", "time_slot", "reason", "notes"]:
-                value = self.request.GET.get(field)
-                if value:
-                    data[field] = value
-            if data:
-                kwargs["data"] = data
-        return kwargs
-
-    def form_valid(self, form):
-        form.instance.status = AppointmentStatus.PENDING
-        return super().form_valid(form)
-
 
 class AppointmentUpdateView(AppointmentAccessMixin, UpdateView):
     model = Appointment
@@ -299,3 +284,19 @@ class AppointmentDeleteView(AppointmentAccessMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context["page_title"] = "Xóa lịch hẹn"
         return context
+
+
+class AppointmentCalendarView(AppointmentAccessMixin, TemplateView):
+    template_name = "scheduling/calendar.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "Lịch tuần"
+        context["doctor_options"] = CustomUser.objects.filter(role=UserRole.DOCTOR).order_by(
+            "first_name", "last_name", "username"
+        )
+        from apps.scheduling.forms import AppointmentForm, SidebarAppointmentForm
+        # Provide an empty form for the sidebar
+        context["form"] = SidebarAppointmentForm()
+        return context
+
