@@ -8,13 +8,96 @@
     <h1 class="mb-2">Hóa đơn</h1>
     <p class="section-subtitle">Theo dõi phát hành, thanh toán và tổng giá trị điều trị.</p>
 </div>
+<div class="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    {% for stat in invoice_stats %}
+        <article class="doctor-stat-card fade-in">
+            <div class="mb-4 flex items-start justify-between gap-4">
+                <div class="doctor-stat-icon"><i data-lucide="{{ stat.icon }}" class="icon-md"></i></div>
+                <span class="badge-soft">{{ stat.tone }}</span>
+            </div>
+            <div class="text-sm font-semibold text-[var(--color-ink-500)]">{{ stat.label }}</div>
+            <div class="mt-3 text-4xl font-extrabold tracking-[-0.04em] text-[var(--color-ink-900)]">{{ stat.value }}</div>
+        </article>
+    {% endfor %}
+</div>
+<div class="mb-6 grid gap-4 lg:grid-cols-2">
+    <div class="surface-card fade-in">
+        <div class="mb-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--color-brand-700)]">Doanh thu đã thanh toán</div>
+        <div class="text-3xl font-extrabold tracking-[-0.03em] text-[var(--color-ink-900)]">{{ invoice_totals.paid_total|vnd }}</div>
+        <p class="mt-2 text-sm text-[var(--color-ink-500)]">Tổng giá trị các hóa đơn đã hoàn tất thanh toán.</p>
+    </div>
+    <div class="surface-card fade-in">
+        <div class="mb-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--color-brand-700)]">Giá trị đã phát hành</div>
+        <div class="text-3xl font-extrabold tracking-[-0.03em] text-[var(--color-ink-900)]">{{ invoice_totals.issued_total|vnd }}</div>
+        <p class="mt-2 text-sm text-[var(--color-ink-500)]">Bao gồm hóa đơn đã phát hành và đã thanh toán.</p>
+    </div>
+</div>
+<section class="surface-card fade-in mb-6">
+    <div class="mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+            <h2 class="section-title !mb-1">Bộ lọc hóa đơn</h2>
+            <p class="section-subtitle">Đối chiếu theo bệnh nhân, bác sĩ, trạng thái và khoảng thời gian phát hành.</p>
+        </div>
+        <div class="badge-soft">Kết quả: {{ invoice_result_count }} hóa đơn</div>
+    </div>
+    <form method="get" class="grid gap-4 lg:grid-cols-5">
+        <div class="lg:col-span-2">
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]" for="id_q">Bệnh nhân hoặc số điện thoại</label>
+            <input id="id_q" name="q" type="search" value="{{ active_filters.q }}" placeholder="Nhập tên bệnh nhân hoặc số điện thoại">
+        </div>
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]" for="id_doctor">Bác sĩ</label>
+            <select id="id_doctor" name="doctor">
+                <option value="">Tất cả bác sĩ</option>
+                {% for doctor in doctor_options %}
+                    <option value="{{ doctor.pk }}" {% if active_filters.doctor == doctor.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ doctor.get_full_name|default:doctor.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]" for="id_status">Trạng thái</label>
+            <select id="id_status" name="status">
+                <option value="">Tất cả trạng thái</option>
+                {% for value, label in status_options %}
+                    <option value="{{ value }}" {% if active_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="flex items-end">
+            <div class="flex w-full gap-3">
+                <button class="btn-primary flex-1" type="submit"><i data-lucide="funnel" class="icon-sm"></i>Lọc</button>
+                <a class="btn-secondary flex-1" href="{% url 'invoice-list' %}"><i data-lucide="rotate-ccw" class="icon-sm"></i>Xóa lọc</a>
+            </div>
+        </div>
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]" for="id_date_from">Từ ngày</label>
+            <input id="id_date_from" name="date_from" type="date" value="{{ active_filters.date_from }}">
+        </div>
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]" for="id_date_to">Đến ngày</label>
+            <input id="id_date_to" name="date_to" type="date" value="{{ active_filters.date_to }}">
+        </div>
+        <div class="lg:col-span-3 flex items-end">
+            <div class="flex flex-wrap gap-2">
+                <span class="badge-soft">Bộ lọc đang dùng: {{ active_filter_count }}</span>
+                {% if active_filters.q %}<span class="badge-soft">Từ khóa: {{ active_filters.q }}</span>{% endif %}
+                {% if active_filters.status %}<span class="badge-soft">Trạng thái đã chọn</span>{% endif %}
+                {% if active_filters.date_from or active_filters.date_to %}<span class="badge-soft">Khoảng ngày</span>{% endif %}
+            </div>
+        </div>
+    </form>
+</section>
 <div class="table-shell fade-in">
     <div class="overflow-x-auto">
         <table>
             <thead>
                 <tr>
+                    <th>STT</th>
                     <th>Bệnh nhân</th>
                     <th>Bác sĩ</th>
+                    <th>Thời gian</th>
                     <th>Tổng tiền</th>
                     <th>Trạng thái</th>
                     <th></th>
@@ -23,8 +106,10 @@
             <tbody>
                 {% for invoice in invoices %}
                     <tr class="table-row">
+                        <td>{{ forloop.counter }}</td>
                         <td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.treatment_plan.appointment.patient.full_name }}</a></td>
                         <td>{{ invoice.treatment_plan.appointment.doctor.get_full_name|default:invoice.treatment_plan.appointment.doctor.username }}</td>
+                        <td>{{ invoice.issued_at|vi_datetime }}</td>
                         <td>{{ invoice.total_amount|vnd }}</td>
                         <td>{{ invoice.get_status_display }}</td>
                         <td class="text-right">
@@ -35,7 +120,7 @@
                         </td>
                     </tr>
                 {% empty %}
-                    <tr class="table-row"><td colspan="5" class="text-[var(--color-ink-500)]">Chưa có hóa đơn.</td></tr>
+                    <tr class="table-row"><td colspan="7" class="text-[var(--color-ink-500)]">Chưa có hóa đơn.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

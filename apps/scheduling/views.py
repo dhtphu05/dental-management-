@@ -3,11 +3,12 @@ from datetime import date, time
 from django.contrib.auth import login
 from django.shortcuts import redirect
 from django.http import QueryDict
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, UpdateView
 
 from apps.accounts.mixins import RoleRequiredMixin
-from apps.accounts.models import UserRole
+from apps.accounts.models import CustomUser, UserRole
 from apps.scheduling.account_forms import BookingAccountCreateForm
 from apps.scheduling.forms import AppointmentForm, PublicBookingForm
 from apps.scheduling.models import Appointment, AppointmentStatus
@@ -59,10 +60,52 @@ class AppointmentListView(AppointmentAccessMixin, ListView):
     context_object_name = "appointments"
 
     def get_queryset(self):
-        return (
-            Appointment.objects.select_related("patient", "doctor")
+        queryset = (
+            Appointment.objects.select_related(
+                "patient",
+                "doctor",
+                "treatment_plan",
+                "treatment_plan__invoice",
+            )
             .order_by("-date", "-time_slot")
         )
+        search = (self.request.GET.get("q") or "").strip()
+        doctor_id = self.request.GET.get("doctor")
+        status = self.request.GET.get("status")
+        date_from = self.request.GET.get("date_from")
+        date_to = self.request.GET.get("date_to")
+
+        if search:
+            queryset = queryset.filter(
+                Q(patient__full_name__icontains=search)
+                | Q(patient__phone__icontains=search)
+            )
+        if doctor_id:
+            queryset = queryset.filter(doctor_id=doctor_id)
+        if status:
+            queryset = queryset.filter(status=status)
+        if date_from:
+            queryset = queryset.filter(date__gte=date_from)
+        if date_to:
+            queryset = queryset.filter(date__lte=date_to)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["doctor_options"] = CustomUser.objects.filter(role=UserRole.DOCTOR).order_by(
+            "first_name", "last_name", "username"
+        )
+        context["status_options"] = AppointmentStatus.choices
+        context["active_filters"] = {
+            "q": self.request.GET.get("q", ""),
+            "doctor": self.request.GET.get("doctor", ""),
+            "status": self.request.GET.get("status", ""),
+            "date_from": self.request.GET.get("date_from", ""),
+            "date_to": self.request.GET.get("date_to", ""),
+        }
+        context["active_filter_count"] = sum(1 for value in context["active_filters"].values() if value)
+        context["appointment_result_count"] = context["appointments"].count()
+        return context
 
 
 class AppointmentDetailView(AppointmentAccessMixin, DetailView):
@@ -95,19 +138,37 @@ class PublicBookingView(BookingSlotMixin, FormView):
     form_class = PublicBookingForm
     success_url = reverse_lazy("dashboard")
 
+    def get_patient_prefill(self):
+        if not self.request.user.is_authenticated or self.request.user.role != UserRole.PATIENT:
+            return {}
+
+        patient = getattr(self.request.user, "patient_profile", None)
+        if patient is None:
+            return {}
+
+        return {
+            "full_name": patient.full_name,
+            "phone": patient.phone,
+        }
+
     def get_initial(self):
-        return {"date": date.today().isoformat()}
+        initial = {"date": date.today().isoformat()}
+        initial.update(self.get_patient_prefill())
+        return initial
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        if self.request.method == "GET" and self.request.GET:
-            data = QueryDict("", mutable=True)
+        if self.request.method == "GET":
+            initial = kwargs.get("initial", {}).copy()
+            for field, value in self.get_patient_prefill().items():
+                if value:
+                    initial[field] = value
             for field in ["full_name", "phone", "doctor", "date", "time_slot", "reason", "notes"]:
                 value = self.request.GET.get(field)
                 if value:
-                    data[field] = value
-            if data:
-                kwargs["data"] = data
+                    initial[field] = value
+            if initial:
+                kwargs["initial"] = initial
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -117,7 +178,7 @@ class PublicBookingView(BookingSlotMixin, FormView):
         context["public_booking"] = True
         form = context.get("form")
         error_step = 1
-        if form and form.errors:
+        if self.request.method == "POST" and form and form.errors:
             if "time_slot" in form.errors:
                 error_step = 2
         context["booking_error_step"] = error_step

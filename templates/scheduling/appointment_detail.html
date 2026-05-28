@@ -14,7 +14,14 @@
         {% if request.user.role == "doctor" %}
             <a class="btn-primary" href="{% url 'doctor-treatment-plan' appointment.pk %}"><i data-lucide="file-pen-line" class="icon-sm"></i>Liệu trình</a>
         {% endif %}
+        {% if request.user.role == "receptionist" or request.user.role == "admin" %}
+            <a class="btn-primary" href="{% url 'doctor-treatment-plan' appointment.pk %}"><i data-lucide="clipboard-plus" class="icon-sm"></i>Thêm dịch vụ</a>
+            {% if not invoice %}
+                <a class="btn-secondary" href="{% url 'invoice-generate' appointment.pk %}"><i data-lucide="receipt" class="icon-sm"></i>Tạo hóa đơn</a>
+            {% endif %}
+        {% endif %}
         {% if invoice and request.user.role != "doctor" %}
+            <a class="btn-secondary" href="{% url 'invoice-detail' invoice.pk %}"><i data-lucide="receipt-text" class="icon-sm"></i>Xem hóa đơn</a>
             <a class="btn-primary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="receipt-text" class="icon-sm"></i>Cập nhật hóa đơn</a>
         {% endif %}
     </div>

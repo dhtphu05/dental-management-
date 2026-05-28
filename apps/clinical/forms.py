@@ -143,6 +143,7 @@ class TreatmentPlanForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["services"].label = "Dịch vụ thực hiện"
         appointment = self.instance.appointment if self.instance.pk else None
         if appointment:
             self.fields["teeth"].queryset = Tooth.objects.filter(

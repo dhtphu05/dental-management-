@@ -3,16 +3,129 @@
 
 {% block title %}Chi tiết hóa đơn{% endblock %}
 
+{% block extra_head %}
+<style>
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+    .print-only {
+        display: none;
+    }
+
+    @media print {
+        html, body {
+            background: white !important;
+        }
+
+        header,
+        .topbar,
+        .no-print,
+        .btn-primary,
+        .btn-secondary,
+        .btn-danger,
+        .btn-ghost,
+        .doctor-stat-icon,
+        [data-lucide] {
+            display: none !important;
+        }
+
+        main.app-shell {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .invoice-print-page,
+        .invoice-print-page section,
+        .invoice-print-page article,
+        .invoice-print-page .surface-card,
+        .invoice-print-page .hero-panel,
+        .invoice-print-page .summary-row,
+        .invoice-print-page .service-option-metric {
+            box-shadow: none !important;
+            background: white !important;
+        }
+
+        .invoice-print-page .surface-card,
+        .invoice-print-page .hero-panel {
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 12px !important;
+            padding: 16px !important;
+        }
+
+        .invoice-print-page .summary-row {
+            padding: 10px 0 !important;
+            border-radius: 0 !important;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .invoice-print-page .rounded-\[28px\],
+        .invoice-print-page .rounded-\[24px\] {
+            border-radius: 10px !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        .invoice-print-page .grid,
+        .invoice-print-page .space-y-6,
+        .invoice-print-page .space-y-4,
+        .invoice-print-page .space-y-3 {
+            gap: 12px !important;
+        }
+
+        .invoice-print-page {
+            color: #0f172a !important;
+        }
+
+        .invoice-print-page .badge-soft {
+            display: inline-flex !important;
+            background: #eff6ff !important;
+            color: #1d4ed8 !important;
+            border: 1px solid #bfdbfe !important;
+        }
+
+        .print-only {
+            display: block !important;
+        }
+
+        .invoice-print-title {
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .invoice-print-title h1 {
+            font-size: 26px !important;
+            line-height: 1.1 !important;
+        }
+
+        .invoice-print-title p {
+            margin-top: 6px;
+            color: #475569;
+            font-size: 13px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+<div class="invoice-print-page">
+<div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between no-print">
     <div>
         <h1 class="mb-2">Hóa đơn #{{ invoice.pk }}</h1>
         <p class="section-subtitle">Chi tiết thanh toán cho hồ sơ điều trị của {{ invoice.treatment_plan.appointment.patient.full_name }}.</p>
     </div>
     <div class="flex flex-wrap gap-3">
         <a class="btn-secondary" href="{% url 'appointment-detail' invoice.treatment_plan.appointment.pk %}"><i data-lucide="calendar-fold" class="icon-sm"></i>Xem lịch hẹn</a>
+        <button class="btn-secondary" type="button" onclick="window.print()"><i data-lucide="printer" class="icon-sm"></i>Xuất hóa đơn</button>
         <a class="btn-primary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Cập nhật hóa đơn</a>
     </div>
+</div>
+
+<div class="print-only invoice-print-title">
+    <h1>Hóa đơn thanh toán</h1>
+    <p>Phòng khám Thiên Phú · 54 Nguyễn Lương Bằng, Phường Liên Chiểu, thành phố Đà Nẵng</p>
 </div>
 
 <section class="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
@@ -123,4 +236,5 @@
         </div>
     </div>
 </section>
+</div>
 {% endblock %}

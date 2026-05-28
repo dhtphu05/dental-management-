@@ -16,6 +16,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>STT</th>
                     <th>Tên</th>
                     <th>Giá</th>
                     <th>Thời gian</th>
@@ -25,6 +26,7 @@
             <tbody>
                 {% for service in services %}
                     <tr class="table-row">
+                        <td>{{ forloop.counter }}</td>
                         <td>{{ service.name }}</td>
                         <td>{{ service.price|vnd }}</td>
                         <td>{{ service.estimated_duration|duration_vi }}</td>
@@ -36,7 +38,7 @@
                         </td>
                     </tr>
                 {% empty %}
-                    <tr class="table-row"><td colspan="4" class="text-[var(--color-ink-500)]">Chưa có dịch vụ.</td></tr>
+                    <tr class="table-row"><td colspan="5" class="text-[var(--color-ink-500)]">Chưa có dịch vụ.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

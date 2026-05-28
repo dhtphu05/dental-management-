@@ -113,11 +113,34 @@
             transform: translateY(-1px);
         }
 
-        input[type="checkbox"] {
+        input[type="checkbox"],
+        input[type="radio"] {
             width: 1.15rem;
+            min-width: 1.15rem;
             height: 1.15rem;
-            accent-color: var(--color-brand-500);
+            min-height: 1.15rem;
+            padding: 0;
+            margin: 0;
+            border-radius: 0.35rem;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            background: white;
             box-shadow: none;
+            transform: none;
+            accent-color: var(--color-brand-500);
+            appearance: auto;
+            -webkit-appearance: checkbox;
+            flex: 0 0 auto;
+        }
+
+        input[type="radio"] {
+            border-radius: 999px;
+            -webkit-appearance: radio;
+        }
+
+        input[type="checkbox"]:focus,
+        input[type="radio"]:focus {
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.16);
+            transform: none;
         }
 
         input::placeholder,
@@ -456,6 +479,11 @@
             width: 100%;
         }
 
+        .table-shell thead th + th,
+        .table-shell tbody td + td {
+            border-left: 1px solid rgba(226, 232, 240, 0.9);
+        }
+
         .table-row {
             border-top: 1px solid rgba(226, 232, 240, 0.8);
             transition: background-color 0.2s ease;
@@ -507,6 +535,121 @@
             padding: 0.9rem 1rem;
             color: var(--color-ink-700);
             font-weight: 500;
+            cursor: pointer;
+        }
+
+        .service-selection-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+
+        .service-option-card {
+            display: block;
+            cursor: pointer;
+        }
+
+        .service-option-card input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .service-option-shell {
+            display: flex;
+            min-height: 100%;
+            flex-direction: column;
+            gap: 1rem;
+            border: 1px solid rgba(203, 213, 225, 0.85);
+            border-radius: 1.75rem;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
+            padding: 1.1rem 1.1rem 1rem;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .service-option-card:hover .service-option-shell {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft-hover);
+            border-color: rgba(33, 150, 243, 0.35);
+        }
+
+        .service-option-card input:checked + .service-option-shell {
+            border-color: rgba(33, 150, 243, 0.7);
+            background: linear-gradient(180deg, rgba(227,242,253,0.72), rgba(255,255,255,0.98));
+            box-shadow: 0 18px 42px rgba(33, 150, 243, 0.18);
+        }
+
+        .service-option-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.85rem;
+        }
+
+        .service-option-check {
+            display: inline-flex;
+            width: 1.3rem;
+            height: 1.3rem;
+            min-width: 1.3rem;
+            border-radius: 0.45rem;
+            border: 1.5px solid rgba(148, 163, 184, 0.9);
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .service-option-card input:checked + .service-option-shell .service-option-check {
+            border-color: var(--color-brand-500);
+            background: var(--color-brand-500);
+            box-shadow: inset 0 0 0 3px white;
+        }
+
+        .service-option-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--color-ink-900);
+            line-height: 1.25;
+        }
+
+        .service-option-subtitle {
+            font-size: 0.92rem;
+            line-height: 1.45;
+            color: var(--color-ink-500);
+        }
+
+        .service-option-meta {
+            display: grid;
+            gap: 0.7rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .service-option-metric {
+            border-radius: 1.2rem;
+            background: rgba(255, 255, 255, 0.82);
+            padding: 0.8rem 0.9rem;
+        }
+
+        .service-option-metric-label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-ink-500);
+        }
+
+        .service-option-metric-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--color-brand-700);
+        }
+
+        .service-summary-panel {
+            border-radius: 1.75rem;
+            background: linear-gradient(135deg, #ffffff 0%, #fbfdff 48%, var(--color-brand-50) 100%);
+            padding: 1.1rem;
+            box-shadow: var(--shadow-soft);
         }
 
         .slot-button {
@@ -788,6 +931,11 @@
             padding: 0.5rem 1.25rem;
         }
 
+        .doctor-table thead th + th,
+        .doctor-table tbody td + td {
+            border-left: 1px solid rgba(226, 232, 240, 0.85);
+        }
+
         .doctor-table tbody td {
             background: white;
             padding: 1rem 1.25rem;
@@ -842,6 +990,8 @@
             {% elif request.user.is_authenticated and request.user.role == "patient" %}
                 <div class="nav-links">
                     <a class="nav-link" href="{% url 'dashboard' %}"><i data-lucide="layout-dashboard" class="icon-sm"></i>Bảng điều khiển</a>
+                    <a class="nav-link" href="{% url 'public-booking' %}"><i data-lucide="calendar-heart" class="icon-sm"></i>Đặt lịch hẹn</a>
+                    <a class="nav-link" href="{% url 'patient-teeth' %}"><i data-lucide="scan-face" class="icon-sm"></i>Tình trạng răng</a>
                     <a class="nav-link" href="{% url 'patient-history' %}"><i data-lucide="files" class="icon-sm"></i>Lịch sử khám</a>
                 </div>
             {% else %}
@@ -861,6 +1011,7 @@
                     </form>
                 {% else %}
                     <a class="btn-primary !px-4 !py-2" href="{% url 'public-booking' %}"><i data-lucide="calendar-heart" class="icon-sm"></i>Đặt lịch hẹn</a>
+                    <a class="btn-secondary !px-4 !py-2" href="{% url 'patient-register' %}"><i data-lucide="user-round-plus" class="icon-sm"></i>Đăng ký</a>
                     <a class="btn-secondary !px-4 !py-2" href="{% url 'login' %}"><i data-lucide="log-in" class="icon-sm"></i>Đăng nhập</a>
                 {% endif %}
             </div>

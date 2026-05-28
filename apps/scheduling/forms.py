@@ -77,6 +77,7 @@ class PublicBookingForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields["time_slot"].required = True
         self.resolved_doctor = None
+        self.fields["date"].widget.attrs["min"] = date.today().isoformat()
 
     def clean_full_name(self):
         full_name = " ".join(self.cleaned_data["full_name"].split())

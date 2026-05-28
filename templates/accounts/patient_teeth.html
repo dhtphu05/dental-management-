@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load currency %}
+
+{% block title %}Tình trạng răng{% endblock %}
+
+{% block content %}
+<section class="hero-panel fade-in mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+        <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-brand-700)]">Odontogram cá nhân</p>
+        <h1 class="mb-2">Tình trạng răng của bạn</h1>
+        <p class="section-subtitle">Theo dõi 32 răng theo sơ đồ nha khoa quốc tế. Trạng thái sẽ được cập nhật sau mỗi lần điều trị.</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+        <a class="btn-secondary" href="{% url 'dashboard' %}"><i data-lucide="arrow-left" class="icon-sm"></i>Quay lại bảng điều khiển</a>
+        <a class="btn-primary" href="{% url 'patient-history' %}"><i data-lucide="files" class="icon-sm"></i>Xem lịch sử khám</a>
+    </div>
+</section>
+
+<section class="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+    {% for stat in tooth_status_summary %}
+        <article class="metric-card fade-in">
+            <div class="mb-3 inline-flex rounded-full px-3 py-2 text-sm font-semibold {{ stat.class_name }}">{{ stat.label }}</div>
+            <div class="text-3xl font-extrabold tracking-[-0.04em] text-[var(--color-ink-900)]">{{ stat.value }}</div>
+        </article>
+    {% endfor %}
+</section>
+
+<section class="surface-card fade-in mb-6">
+    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <h2 class="section-title !text-xl">Tổng quan cập nhật</h2>
+            <p class="section-subtitle">
+                {% if last_tooth_update %}
+                    Cập nhật gần nhất: {{ last_tooth_update.updated_at|vi_datetime }}
+                {% else %}
+                    Chưa có dữ liệu cập nhật.
+                {% endif %}
+            </p>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs font-semibold">
+            <span class="rounded-full bg-rose-50 px-3 py-2 text-rose-600">Sâu răng</span>
+            <span class="rounded-full bg-sky-50 px-3 py-2 text-sky-600">Đã điều trị</span>
+            <span class="rounded-full bg-slate-100 px-3 py-2 text-slate-500">Mất răng</span>
+            <span class="rounded-full bg-amber-50 px-3 py-2 text-amber-700">Răng sứ</span>
+        </div>
+    </div>
+
+    <div class="grid gap-4 lg:grid-cols-2">
+        {% for section in odontogram_sections %}
+            <section class="rounded-[2rem] bg-slate-50/80 p-5">
+                <div class="mb-4 flex items-center justify-between">
+                    <h3>{{ section.label }}</h3>
+                    <span class="badge-soft">{{ section.teeth|length }} răng</span>
+                </div>
+                <div class="grid grid-cols-4 gap-3">
+                    {% for tooth in section.teeth %}
+                        <article class="tooth-tile{% if tooth.status == 'cavity' %} tooth-tile-cavity{% elif tooth.status == 'treated' %} tooth-tile-treated{% elif tooth.status == 'missing' %} tooth-tile-missing{% endif %}">
+                            <svg viewBox="0 0 64 88" class="tooth-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 8C10 13 8 22 10 32L14 49C15 55 19 60 24 64L28 77C29 81 35 81 36 77L40 64C45 60 49 55 50 49L54 32C56 22 54 13 47 8C42 5 36 7 32 12C28 7 22 5 17 8Z" fill="currentColor" class="text-white/95"/>
+                                <path d="M17 8C10 13 8 22 10 32L14 49C15 55 19 60 24 64L28 77C29 81 35 81 36 77L40 64C45 60 49 55 50 49L54 32C56 22 54 13 47 8C42 5 36 7 32 12C28 7 22 5 17 8Z" stroke="currentColor" stroke-width="4" class="text-slate-200"/>
+                            </svg>
+                            <span class="tooth-number">{{ tooth.tooth_number }}</span>
+                            <span class="tooth-status-pill {% if tooth.status == 'cavity' %}bg-rose-100 text-rose-600{% elif tooth.status == 'treated' %}bg-sky-100 text-sky-600{% elif tooth.status == 'missing' %}bg-slate-200 text-slate-600{% elif tooth.status == 'crown' %}bg-amber-100 text-amber-700{% else %}bg-slate-100 text-slate-500{% endif %}">
+                                {{ tooth.get_status_display }}
+                            </span>
+                            {% if tooth.notes %}
+                                <span class="text-center text-xs text-[var(--color-ink-500)]">{{ tooth.notes }}</span>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -42,6 +42,12 @@
                 <i data-lucide="log-in" class="icon-sm"></i>Đăng nhập
             </button>
         </form>
+        <div class="mt-6 rounded-[1.6rem] bg-white/70 px-5 py-4 text-sm text-[var(--color-ink-700)]">
+            Chưa có tài khoản bệnh nhân?
+            <a class="ml-2 font-semibold text-[var(--color-brand-700)] hover:underline" href="{% url 'patient-register' %}">
+                Đăng ký ngay
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

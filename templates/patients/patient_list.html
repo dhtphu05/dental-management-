@@ -15,6 +15,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>STT</th>
                     <th>Họ tên</th>
                     <th>Điện thoại</th>
                     <th>Ngày sinh</th>
@@ -24,6 +25,7 @@
             <tbody>
                 {% for patient in patients %}
                     <tr class="table-row">
+                        <td>{{ forloop.counter }}</td>
                         <td><a href="{% url 'patient-detail' patient.pk %}">{{ patient.full_name }}</a></td>
                         <td>{{ patient.phone }}</td>
                         <td>{{ patient.date_of_birth|default:"-" }}</td>
@@ -35,7 +37,7 @@
                         </td>
                     </tr>
                 {% empty %}
-                    <tr class="table-row"><td colspan="4" class="text-[var(--color-ink-500)]">Chưa có bệnh nhân.</td></tr>
+                    <tr class="table-row"><td colspan="5" class="text-[var(--color-ink-500)]">Chưa có bệnh nhân.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

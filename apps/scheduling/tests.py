@@ -312,3 +312,61 @@ class AppointmentDetailViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Chưa có dữ liệu điều trị cho lịch hẹn này.")
         self.assertContains(response, "Chưa có dữ liệu hóa đơn cho lịch hẹn này.")
+
+
+class AppointmentListFilterTests(TestCase):
+    def setUp(self):
+        self.receptionist = CustomUser.objects.create_user(
+            username="reception-filter",
+            password="secret123",
+            phone="0900990001",
+            role=UserRole.RECEPTIONIST,
+        )
+        self.first_doctor = CustomUser.objects.create_user(
+            username="doctor-filter-1",
+            password="secret123",
+            phone="0900990002",
+            role=UserRole.DOCTOR,
+        )
+        self.second_doctor = CustomUser.objects.create_user(
+            username="doctor-filter-2",
+            password="secret123",
+            phone="0900990003",
+            role=UserRole.DOCTOR,
+        )
+        self.first_patient = Patient.objects.create(full_name="Nguyễn Thị Mai", phone="0912000001")
+        self.second_patient = Patient.objects.create(full_name="Trần Quốc Bảo", phone="0912000002")
+
+        Appointment.objects.create(
+            patient=self.first_patient,
+            doctor=self.first_doctor,
+            date=date(2026, 3, 20),
+            time_slot=time(9, 0),
+            status=AppointmentStatus.CONFIRMED,
+        )
+        Appointment.objects.create(
+            patient=self.second_patient,
+            doctor=self.second_doctor,
+            date=date(2026, 3, 21),
+            time_slot=time(10, 0),
+            status=AppointmentStatus.CANCELLED,
+        )
+
+        self.client.login(username="reception-filter", password="secret123")
+
+    def test_appointment_list_filters_by_doctor_and_status(self):
+        response = self.client.get(
+            reverse("appointment-list"),
+            {"doctor": self.first_doctor.pk, "status": AppointmentStatus.CONFIRMED},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nguyễn Thị Mai")
+        self.assertNotContains(response, "Trần Quốc Bảo")
+
+    def test_appointment_list_filters_by_search_keyword(self):
+        response = self.client.get(reverse("appointment-list"), {"q": "0912000002"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Trần Quốc Bảo")
+        self.assertNotContains(response, "Nguyễn Thị Mai")

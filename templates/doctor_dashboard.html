@@ -143,6 +143,7 @@
                 <table class="doctor-table">
                     <thead>
                         <tr>
+                            <th>STT</th>
                             <th>Bệnh nhân</th>
                             <th>Ngày</th>
                             <th>Khung giờ</th>
@@ -153,6 +154,7 @@
                     <tbody>
                         {% for appointment in upcoming_appointments %}
                             <tr>
+                                <td>{{ forloop.counter }}</td>
                                 <td>
                                     <div class="font-semibold text-[var(--color-ink-900)]">{{ appointment.patient.full_name }}</div>
                                     <div class="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-500)]">Mã bệnh nhân #{{ appointment.patient.pk }}</div>
@@ -169,7 +171,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="5" class="!rounded-[24px] text-[var(--color-ink-500)]">Chưa có lịch hẹn sắp tới.</td>
+                                <td colspan="6" class="!rounded-[24px] text-[var(--color-ink-500)]">Chưa có lịch hẹn sắp tới.</td>
                             </tr>
                         {% endfor %}
                     </tbody>

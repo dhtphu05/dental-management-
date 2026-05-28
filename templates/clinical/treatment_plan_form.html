@@ -1,12 +1,18 @@
 {% extends "base.html" %}
-{% load currency %}
+{% load currency l10n %}
 
 {% block title %}Cập nhật điều trị{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-5xl">
     <div class="surface-card fade-in">
-        <h1 class="mb-3">Cập nhật liệu trình cho {{ object.appointment.patient.full_name }}</h1>
+        <h1 class="mb-3">
+            {% if is_clinical_staff %}
+                Cập nhật dịch vụ và liệu trình cho {{ object.appointment.patient.full_name }}
+            {% else %}
+                Cập nhật liệu trình cho {{ object.appointment.patient.full_name }}
+            {% endif %}
+        </h1>
         <p class="section-subtitle mb-6">Lịch hẹn: {{ object.appointment.date|vi_date_long }} lúc {{ object.appointment.time_slot|vi_time }}</p>
         <form method="post">
             {% csrf_token %}
@@ -18,7 +24,13 @@
                 <div class="mb-4 flex items-end justify-between gap-4">
                     <div>
                         <h2 class="section-title !text-xl">Sơ đồ răng</h2>
-                        <p class="section-subtitle">32 răng chia thành 4 cung hàm. Nhấp vào từng răng để mở cửa sổ cập nhật tình trạng.</p>
+                        <p class="section-subtitle">
+                            {% if is_clinical_staff %}
+                                Chọn răng, dịch vụ và cập nhật thông tin điều trị để chuẩn bị hóa đơn cho lịch hẹn này.
+                            {% else %}
+                                32 răng chia thành 4 cung hàm. Nhấp vào từng răng để mở cửa sổ cập nhật tình trạng.
+                            {% endif %}
+                        </p>
                     </div>
                     <div class="flex flex-wrap gap-2 text-xs font-semibold">
                         <span class="rounded-full bg-rose-50 px-3 py-2 text-rose-600">Sâu răng</span>
@@ -62,8 +74,69 @@
                     <div class="mb-5">
                         <label class="mb-2 block text-sm font-semibold text-[var(--color-ink-700)]">{{ field.label }}</label>
                         {% if field.name == "services" %}
-                            <div class="checkbox-grid">
-                                {{ field }}
+                            <div class="service-summary-panel mb-5">
+                                <div class="mb-4 flex flex-wrap items-start justify-between gap-4">
+                                    <div>
+                                        <h3 class="mb-1">Tổng hợp dịch vụ đã chọn</h3>
+                                        <p class="section-subtitle">Theo dõi nhanh tổng tiền, tổng thời lượng và thời điểm dự kiến hoàn tất.</p>
+                                    </div>
+                                    <span class="badge-soft"><i data-lucide="sparkles" class="icon-sm"></i><span id="service-count">{{ selected_services_count }}</span> dịch vụ</span>
+                                </div>
+                                <div class="grid gap-3 md:grid-cols-3">
+                                    <div class="service-option-metric">
+                                        <span class="service-option-metric-label">Tổng chi phí</span>
+                                        <span class="service-option-metric-value" id="service-total-price">{{ selected_services_total|vnd }}</span>
+                                    </div>
+                                    <div class="service-option-metric">
+                                        <span class="service-option-metric-label">Tổng thời lượng</span>
+                                        <span class="service-option-metric-value" id="service-total-duration">{{ selected_services_duration|duration_vi }}</span>
+                                    </div>
+                                    <div class="service-option-metric">
+                                        <span class="service-option-metric-label">Dự kiến hoàn tất</span>
+                                        <span class="service-option-metric-value" id="service-estimated-finish">{{ estimated_finish_time|vi_time }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-selection-grid">
+                                {% for card in service_cards %}
+                                    <label class="service-option-card">
+                                        <input
+                                            type="checkbox"
+                                            name="services"
+                                            value="{{ card.id }}"
+                                            data-service-option
+                                            data-service-price="{{ card.price|unlocalize }}"
+                                            data-service-duration="{{ card.duration_minutes }}"
+                                            {% if card.checked %}checked{% endif %}
+                                        >
+                                        <span class="service-option-shell">
+                                            <span class="service-option-head">
+                                                <span class="service-option-check" aria-hidden="true"></span>
+                                                <span class="flex-1">
+                                                    <span class="service-option-title">{{ card.name }}</span>
+                                                    <span class="service-option-subtitle mt-2 block">
+                                                        {{ card.description|default:"Dịch vụ sẽ được ghi vào hồ sơ điều trị và tính vào hóa đơn khi lưu." }}
+                                                    </span>
+                                                </span>
+                                            </span>
+                                            <span class="service-option-meta">
+                                                <span class="service-option-metric">
+                                                    <span class="service-option-metric-label">Giá tiền</span>
+                                                    <span class="service-option-metric-value">{{ card.price|vnd }}</span>
+                                                </span>
+                                                <span class="service-option-metric">
+                                                    <span class="service-option-metric-label">Thời lượng</span>
+                                                    <span class="service-option-metric-value">{{ card.duration|duration_vi }}</span>
+                                                </span>
+                                                <span class="service-option-metric" style="grid-column: 1 / -1;">
+                                                    <span class="service-option-metric-label">Nếu bắt đầu lúc {{ object.appointment.time_slot|vi_time }}</span>
+                                                    <span class="service-option-metric-value">Dự kiến xong {{ card.estimated_end|vi_time }}</span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </label>
+                                {% endfor %}
                             </div>
                         {% else %}
                             {{ field }}
@@ -73,7 +146,15 @@
                     </div>
                 {% endif %}
             {% endfor %}
-            <button class="btn-primary" type="submit"><i data-lucide="save" class="icon-sm"></i>Lưu liệu trình</button>
+            <div class="flex flex-wrap gap-3">
+                <button class="btn-primary" type="submit">
+                    <i data-lucide="save" class="icon-sm"></i>
+                    {% if is_clinical_staff %}Lưu dịch vụ và liệu trình{% else %}Lưu liệu trình{% endif %}
+                </button>
+                <a class="btn-secondary" href="{% url 'appointment-detail' object.appointment.pk %}">
+                    <i data-lucide="arrow-left" class="icon-sm"></i>Quay lại lịch hẹn
+                </a>
+            </div>
         </form>
     </div>
 </div>
@@ -207,5 +288,64 @@
     });
 
     syncSelectedTeeth();
+
+    const serviceOptionInputs = Array.from(document.querySelectorAll("[data-service-option]"));
+    const serviceCount = document.getElementById("service-count");
+    const serviceTotalPrice = document.getElementById("service-total-price");
+    const serviceTotalDuration = document.getElementById("service-total-duration");
+    const serviceEstimatedFinish = document.getElementById("service-estimated-finish");
+    const appointmentStart = "{{ object.appointment.time_slot|vi_time }}";
+
+    const formatCurrencyVnd = (amount) => {
+        const rounded = Math.round(amount);
+        return `${rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;
+    };
+
+    const parseServicePrice = (rawValue) => {
+        if (!rawValue) return 0;
+        const normalized = String(rawValue).trim().replace(/\s+/g, "").replace(",", ".");
+        const parsed = Number(normalized);
+        return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const formatDurationVi = (minutes) => {
+        if (!minutes) return "0 phút";
+        const hours = Math.floor(minutes / 60);
+        const remainder = minutes % 60;
+        const parts = [];
+        if (hours) parts.push(`${hours} giờ`);
+        if (remainder) parts.push(`${remainder} phút`);
+        return parts.join(" ");
+    };
+
+    const addMinutesToTime = (timeString, minutesToAdd) => {
+        const [hours, minutes] = timeString.split(":").map(Number);
+        const totalMinutes = hours * 60 + minutes + minutesToAdd;
+        const normalized = ((totalMinutes % (24 * 60)) + (24 * 60)) % (24 * 60);
+        const newHours = String(Math.floor(normalized / 60)).padStart(2, "0");
+        const newMinutes = String(normalized % 60).padStart(2, "0");
+        return `${newHours}:${newMinutes}`;
+    };
+
+    const syncServiceSummary = () => {
+        let selectedCount = 0;
+        let totalPrice = 0;
+        let totalDuration = 0;
+
+        serviceOptionInputs.forEach((input) => {
+            if (!input.checked) return;
+            selectedCount += 1;
+            totalPrice += parseServicePrice(input.dataset.servicePrice);
+            totalDuration += Number(input.dataset.serviceDuration || 0);
+        });
+
+        if (serviceCount) serviceCount.textContent = selectedCount;
+        if (serviceTotalPrice) serviceTotalPrice.textContent = formatCurrencyVnd(totalPrice);
+        if (serviceTotalDuration) serviceTotalDuration.textContent = formatDurationVi(totalDuration);
+        if (serviceEstimatedFinish) serviceEstimatedFinish.textContent = addMinutesToTime(appointmentStart, totalDuration);
+    };
+
+    serviceOptionInputs.forEach((input) => input.addEventListener("change", syncServiceSummary));
+    syncServiceSummary();
 </script>
 {% endblock %}

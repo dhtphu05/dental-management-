@@ -11,7 +11,11 @@
         <h1 class="mb-2">Theo dõi lịch hẹn và hồ sơ khám của bạn</h1>
         <p class="section-subtitle">Đây là bản xem nhanh. Bạn có thể mở toàn bộ lịch sử khám để xem chẩn đoán, dịch vụ, răng đã xử lý và hóa đơn.</p>
     </div>
-    <a class="btn-primary" href="{% url 'patient-history' %}"><i data-lucide="files" class="icon-sm"></i>Xem toàn bộ lịch sử khám</a>
+    <div class="flex flex-wrap gap-3">
+        <a class="btn-primary" href="{% url 'public-booking' %}"><i data-lucide="calendar-heart" class="icon-sm"></i>Đặt lịch hẹn</a>
+        <a class="btn-secondary" href="{% url 'patient-teeth' %}"><i data-lucide="scan-face" class="icon-sm"></i>Xem tình trạng răng</a>
+        <a class="btn-secondary" href="{% url 'patient-history' %}"><i data-lucide="files" class="icon-sm"></i>Xem toàn bộ lịch sử khám</a>
+    </div>
 </section>
 
 <section class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -21,11 +25,13 @@
                 <h2 class="section-title !text-xl">Lịch hẹn sắp tới</h2>
                 <p class="section-subtitle">Các lịch hẹn chưa bị hủy của bạn trong thời gian tới.</p>
             </div>
+            <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'public-booking' %}"><i data-lucide="calendar-plus-2" class="icon-sm"></i>Tạo cuộc hẹn</a>
         </div>
         <div class="overflow-x-auto">
             <table>
                 <thead>
                     <tr>
+                        <th>STT</th>
                         <th>Bác sĩ</th>
                         <th>Ngày</th>
                         <th>Giờ</th>
@@ -35,13 +41,14 @@
                 <tbody>
                     {% for appointment in upcoming_appointments %}
                         <tr class="table-row">
+                            <td>{{ forloop.counter }}</td>
                             <td>{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</td>
                             <td>{{ appointment.date|vi_date }}</td>
                             <td>{{ appointment.time_slot|vi_time }}</td>
                             <td>{{ appointment.get_status_display }}</td>
                         </tr>
                     {% empty %}
-                        <tr class="table-row"><td colspan="4" class="text-[var(--color-ink-500)]">Bạn chưa có lịch hẹn sắp tới.</td></tr>
+                        <tr class="table-row"><td colspan="5" class="text-[var(--color-ink-500)]">Bạn chưa có lịch hẹn sắp tới.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -76,6 +83,18 @@
         {% endif %}
     </div>
 </section>
+<section class="surface-card fade-in-delay-1 mt-6">
+    <div class="mb-4 flex items-center justify-between gap-4">
+        <div>
+            <h2 class="section-title !text-xl">Tình trạng răng của bạn</h2>
+            <p class="section-subtitle">Xem nhanh sơ đồ răng hiện tại và các thay đổi sau điều trị.</p>
+        </div>
+        <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'patient-teeth' %}"><i data-lucide="arrow-right" class="icon-sm"></i>Mở sơ đồ răng</a>
+    </div>
+    <div class="rounded-[24px] bg-slate-50 px-5 py-5 text-[var(--color-ink-700)]">
+        Truy cập mục <span class="font-semibold text-[var(--color-brand-700)]">Tình trạng răng</span> để xem đầy đủ 32 răng, màu trạng thái và thời điểm cập nhật gần nhất.
+    </div>
+</section>
 {% else %}
 <section class="hero-panel fade-in mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
     <div>
@@ -107,6 +126,7 @@
             <table>
                         <thead>
                             <tr>
+                                <th>STT</th>
                                 <th>Bệnh nhân</th>
                                 <th>Bác sĩ</th>
                                 <th>Ngày</th>
@@ -117,6 +137,7 @@
                         <tbody>
                             {% for appointment in upcoming_appointments %}
                                 <tr class="table-row">
+                                    <td>{{ forloop.counter }}</td>
                                     <td>{{ appointment.patient.full_name }}</td>
                                     <td>{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</td>
                                     <td>{{ appointment.date|vi_date }}</td>
@@ -128,7 +149,7 @@
                                     </td>
                                 </tr>
                             {% empty %}
-                                <tr class="table-row"><td colspan="5" class="text-[var(--color-ink-500)]">Chưa có lịch hẹn.</td></tr>
+                                <tr class="table-row"><td colspan="6" class="text-[var(--color-ink-500)]">Chưa có lịch hẹn.</td></tr>
                             {% endfor %}
                         </tbody>
             </table>

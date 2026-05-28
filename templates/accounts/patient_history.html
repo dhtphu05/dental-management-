@@ -64,6 +64,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>STT</th>
                     <th>Ngày khám</th>
                     <th>Bác sĩ</th>
                     <th>Chẩn đoán</th>
@@ -74,6 +75,7 @@
             <tbody>
                 {% for record in records %}
                     <tr class="table-row">
+                        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
                         <td>{{ record.appointment.date|vi_date }} {{ record.appointment.time_slot|vi_time }}</td>
                         <td>{{ record.appointment.doctor.get_full_name|default:record.appointment.doctor.username }}</td>
                         <td>{{ record.treatment_plan.diagnosis|default:"Chưa có chẩn đoán" }}</td>
@@ -90,7 +92,7 @@
                     </tr>
                 {% empty %}
                     <tr class="table-row">
-                        <td colspan="5" class="text-[var(--color-ink-500)]">Bạn chưa có lượt khám hoàn tất nào để hiển thị trong lịch sử.</td>
+                        <td colspan="6" class="text-[var(--color-ink-500)]">Bạn chưa có lượt khám hoàn tất nào để hiển thị trong lịch sử.</td>
                     </tr>
                 {% endfor %}
             </tbody>

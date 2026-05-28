@@ -2,6 +2,132 @@
 
 {% block title %}Đặt lịch hẹn{% endblock %}
 
+{% block extra_head %}
+<style>
+    .booking-shell {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .booking-form-section {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .booking-field-card {
+        border-radius: 1.6rem;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        padding: 1rem;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .booking-field-card:focus-within {
+        border-color: rgba(33, 150, 243, 0.45);
+        box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.08), var(--shadow-soft);
+    }
+
+    .booking-field-head {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .booking-field-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 1rem;
+        background: var(--color-brand-50);
+        color: var(--color-brand-700);
+        flex: 0 0 auto;
+    }
+
+    .booking-field-label {
+        display: block;
+        font-size: 0.94rem;
+        font-weight: 700;
+        color: var(--color-ink-900);
+    }
+
+    .booking-field-note {
+        margin-top: 0.18rem;
+        font-size: 0.82rem;
+        color: var(--color-ink-500);
+    }
+
+    .booking-field-card input,
+    .booking-field-card select,
+    .booking-field-card textarea {
+        min-height: 3.55rem;
+        border-radius: 1.2rem;
+        background: #fff;
+        box-shadow: none;
+    }
+
+    .booking-aside-card {
+        border-radius: 1.8rem;
+        background: linear-gradient(135deg, #ffffff 0%, #fbfdff 52%, var(--color-brand-50) 100%);
+        padding: 1.25rem;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .booking-inline-alert {
+        display: none;
+        border-radius: 1.1rem;
+        background: #fff1f2;
+        color: #be123c;
+        padding: 0.9rem 1rem;
+        font-size: 0.92rem;
+        font-weight: 600;
+    }
+
+    .booking-inline-alert.is-visible {
+        display: block;
+    }
+
+    .booking-summary-grid {
+        display: grid;
+        gap: 0.85rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .booking-summary-item {
+        border-radius: 1.2rem;
+        background: rgba(255,255,255,0.88);
+        padding: 0.95rem 1rem;
+    }
+
+    .booking-summary-item span {
+        display: block;
+    }
+
+    .booking-summary-item .summary-label {
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-ink-500);
+    }
+
+    .booking-summary-item .summary-value {
+        margin-top: 0.35rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--color-ink-900);
+    }
+
+    @media (max-width: 767px) {
+        .booking-summary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="hero-panel fade-in mb-8">
     <div class="max-w-3xl">
@@ -36,46 +162,91 @@
     </div>
 </section>
 
-<form method="post" class="space-y-6">
+<form method="post" class="booking-shell">
     {% csrf_token %}
     {{ form.non_field_errors }}
     {{ form.time_slot }}
+    <div id="booking-inline-alert" class="booking-inline-alert"></div>
 
     <section class="space-y-6" data-step-panel="1">
-        <div class="surface-card fade-in space-y-5">
+        <div class="surface-card fade-in">
             <div>
                 <h2 class="section-title !text-xl">Bước 1: Thông tin người đặt</h2>
                 <p class="section-subtitle">Chỉ cần họ tên và số điện thoại để bắt đầu. Chưa tạo tài khoản ở bước này.</p>
             </div>
 
-            <div class="grid gap-5 lg:grid-cols-2">
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-ink-700">{{ form.full_name.label }}</label>
-                    {{ form.full_name }}
-                    {% for error in form.full_name.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+            <div class="booking-form-section mt-6 grid lg:grid-cols-[1.05fr_0.95fr]">
+                <div class="grid gap-5">
+                    <div class="booking-field-card">
+                        <div class="booking-field-head">
+                            <span class="booking-field-icon"><i data-lucide="user-round" class="icon-sm"></i></span>
+                            <div>
+                                <label class="booking-field-label">{{ form.full_name.label }}</label>
+                                <p class="booking-field-note">Tên dùng để xác nhận lịch khi phòng khám liên hệ.</p>
+                            </div>
+                        </div>
+                        {{ form.full_name }}
+                        {% for error in form.full_name.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="booking-field-card">
+                        <div class="booking-field-head">
+                            <span class="booking-field-icon"><i data-lucide="phone" class="icon-sm"></i></span>
+                            <div>
+                                <label class="booking-field-label">{{ form.phone.label }}</label>
+                                <p class="booking-field-note">Dùng để nhắc lịch và tra cứu hồ sơ về sau.</p>
+                            </div>
+                        </div>
+                        {{ form.phone }}
+                        {% for error in form.phone.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                    </div>
                 </div>
 
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-ink-700">{{ form.phone.label }}</label>
-                    {{ form.phone }}
-                    {% for error in form.phone.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                <div class="booking-aside-card">
+                    <div class="mb-4">
+                        <h3>Thông tin sẽ được dùng như thế nào</h3>
+                        <p class="section-subtitle mt-2">Chúng tôi chỉ cần dữ liệu đủ để giữ chỗ và xác nhận lịch. Bạn chưa cần tạo tài khoản ở bước này.</p>
+                    </div>
+                    <div class="booking-summary-grid">
+                        <div class="booking-summary-item">
+                            <span class="summary-label">Giữ chỗ</span>
+                            <span class="summary-value">Theo số điện thoại</span>
+                        </div>
+                        <div class="booking-summary-item">
+                            <span class="summary-label">Xác nhận</span>
+                            <span class="summary-value">Qua hotline</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid gap-5 lg:grid-cols-2">
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-ink-700">{{ form.reason.label }}</label>
+            <div class="mt-5 grid gap-5 lg:grid-cols-2">
+                <div class="booking-field-card">
+                    <div class="booking-field-head">
+                        <span class="booking-field-icon"><i data-lucide="stethoscope" class="icon-sm"></i></span>
+                        <div>
+                            <label class="booking-field-label">{{ form.reason.label }}</label>
+                            <p class="booking-field-note">Ví dụ: đau răng, tái khám, cạo vôi, tư vấn tổng quát.</p>
+                        </div>
+                    </div>
                     {{ form.reason }}
                     {% for error in form.reason.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
                 </div>
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-ink-700">{{ form.notes.label }}</label>
+
+                <div class="booking-field-card">
+                    <div class="booking-field-head">
+                        <span class="booking-field-icon"><i data-lucide="notebook-pen" class="icon-sm"></i></span>
+                        <div>
+                            <label class="booking-field-label">{{ form.notes.label }}</label>
+                            <p class="booking-field-note">Thêm ghi chú nếu bạn muốn phòng khám chuẩn bị trước.</p>
+                        </div>
+                    </div>
                     {{ form.notes }}
                     {% for error in form.notes.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
                 </div>
             </div>
 
-            <div class="flex justify-end">
+            <div class="mt-6 flex justify-end">
                 <button type="button" class="btn-primary" data-next-step><i data-lucide="arrow-right" class="icon-sm"></i>Tiếp tục chọn lịch</button>
             </div>
         </div>
@@ -89,21 +260,33 @@
                     <p class="section-subtitle">Bạn có thể chọn bác sĩ cụ thể hoặc để hệ thống tự tìm bác sĩ còn trống cho khung giờ phù hợp.</p>
                 </div>
 
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-ink-700">{{ form.doctor.label }}</label>
+                <div class="booking-field-card">
+                    <div class="booking-field-head">
+                        <span class="booking-field-icon"><i data-lucide="user-round-search" class="icon-sm"></i></span>
+                        <div>
+                            <label class="booking-field-label">{{ form.doctor.label }}</label>
+                            <p class="booking-field-note">Chọn bác sĩ cụ thể hoặc để hệ thống sắp người phù hợp.</p>
+                        </div>
+                    </div>
                     {{ form.doctor }}
                     {% for error in form.doctor.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
                 </div>
 
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-ink-700">{{ form.date.label }}</label>
+                <div class="booking-field-card">
+                    <div class="booking-field-head">
+                        <span class="booking-field-icon"><i data-lucide="calendar-days" class="icon-sm"></i></span>
+                        <div>
+                            <label class="booking-field-label">{{ form.date.label }}</label>
+                            <p class="booking-field-note">Chọn ngày khám mong muốn để hệ thống làm mới khung giờ trống.</p>
+                        </div>
+                    </div>
                     {{ form.date }}
                     {% for error in form.date.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
                 </div>
 
-                <div class="rounded-3xl bg-brand-50 p-5 text-sm text-ink-700">
-                    <p class="font-semibold text-brand-700">Lưu ý</p>
-                    <p class="mt-2">Nếu chọn “Bất kỳ bác sĩ phù hợp”, hệ thống sẽ tự gán bác sĩ còn trống khi bạn xác nhận đặt lịch.</p>
+                <div class="booking-aside-card">
+                    <p class="font-semibold text-brand-700">Gợi ý nhanh</p>
+                    <p class="mt-2 text-sm text-ink-700">Nếu bạn chỉ cần lịch sớm, hãy để hệ thống tự chọn bác sĩ còn trống thay vì lọc theo từng người.</p>
                 </div>
             </div>
 
@@ -132,9 +315,15 @@
                     {% endfor %}
                 </div>
 
-                <div class="mt-5 rounded-3xl bg-brand-50 p-5 text-sm text-ink-700">
-                    <p class="font-semibold text-brand-700">Ghi chú</p>
-                    <p class="mt-2">Khung giờ được chọn sẽ có hiệu ứng xanh nhẹ. Khung giờ đã đặt sẽ bị làm mờ và không thể bấm.</p>
+                <div class="mt-5 booking-summary-grid">
+                    <div class="booking-summary-item">
+                        <span class="summary-label">Khả dụng</span>
+                        <span class="summary-value">Bấm để chọn slot trống</span>
+                    </div>
+                    <div class="booking-summary-item">
+                        <span class="summary-label">Đã kín</span>
+                        <span class="summary-value">Ô mờ sẽ không bấm được</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -202,6 +391,7 @@
     const progressLabel = document.getElementById("progress-label");
     const nextButtons = Array.from(document.querySelectorAll("[data-next-step]"));
     const prevButtons = Array.from(document.querySelectorAll("[data-prev-step]"));
+    const inlineAlert = document.getElementById("booking-inline-alert");
     const summaryTargets = {
         patient: document.querySelector("[data-summary-patient]"),
         phone: document.querySelector("[data-summary-phone]"),
@@ -209,6 +399,7 @@
         slot: document.querySelector("[data-summary-slot]"),
         reason: document.querySelector("[data-summary-reason]")
     };
+    const todayValue = "{{ today }}";
     let currentStep = {{ booking_error_step|default:1 }};
 
     const optionLabel = (field) => field.options[field.selectedIndex] ? field.options[field.selectedIndex].text : "Chưa chọn";
@@ -267,12 +458,21 @@
 
     const validateStep = () => {
         if (currentStep === 1) {
-            return fullNameField.value.trim() && phoneField.value.trim();
+            if (!fullNameField.value.trim() || !phoneField.value.trim()) {
+                return "Vui lòng nhập họ tên và số điện thoại trước khi sang bước tiếp theo.";
+            }
+            return "";
         }
         if (currentStep === 2) {
-            return dateField.value && timeSlotField.value;
+            if (dateField.value && dateField.value < todayValue) {
+                return "Không thể đặt lịch cho ngày trong quá khứ.";
+            }
+            if (!dateField.value || !timeSlotField.value) {
+                return "Vui lòng chọn ngày khám và một khung giờ phù hợp.";
+            }
+            return "";
         }
-        return true;
+        return "";
     };
 
     slotButtons.forEach((button) => {
@@ -286,10 +486,13 @@
 
     nextButtons.forEach((button) => {
         button.addEventListener("click", () => {
-            if (!validateStep()) {
-                alert("Vui lòng hoàn thành thông tin bắt buộc trước khi sang bước tiếp theo.");
+            const errorMessage = validateStep();
+            if (errorMessage) {
+                inlineAlert.textContent = errorMessage;
+                inlineAlert.classList.add("is-visible");
                 return;
             }
+            inlineAlert.classList.remove("is-visible");
             currentStep = Math.min(3, currentStep + 1);
             renderStep();
         });
@@ -307,15 +510,22 @@
         updateSummary();
     });
     dateField.addEventListener("change", () => {
+        if (dateField.value && dateField.value < todayValue) {
+            dateField.value = todayValue;
+        }
         syncSlots();
         updateSummary();
     });
     fullNameField.addEventListener("input", updateSummary);
     phoneField.addEventListener("input", updateSummary);
     reasonField.addEventListener("input", updateSummary);
+    [fullNameField, phoneField, reasonField, doctorField, dateField].forEach((field) => {
+        field?.addEventListener("input", () => inlineAlert.classList.remove("is-visible"));
+        field?.addEventListener("change", () => inlineAlert.classList.remove("is-visible"));
+    });
 
     if (!dateField.value) {
-        dateField.value = "{{ today }}";
+        dateField.value = todayValue;
     }
 
     syncSlots();
