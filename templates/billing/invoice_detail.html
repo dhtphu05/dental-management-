@@ -119,7 +119,15 @@
     <div class="flex flex-wrap gap-3">
         <a class="btn-secondary" href="{% url 'appointment-detail' invoice.treatment_plan.appointment.pk %}"><i data-lucide="calendar-fold" class="icon-sm"></i>Xem lịch hẹn</a>
         <button class="btn-secondary" type="button" onclick="window.print()"><i data-lucide="printer" class="icon-sm"></i>Xuất hóa đơn</button>
-        <a class="btn-primary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Cập nhật hóa đơn</a>
+        {% if invoice.status != 'paid' %}
+            <form method="post" action="{% url 'invoice-update' invoice.pk %}" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="paid">
+                <input type="hidden" name="total_amount" value="{{ invoice.total_amount }}">
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm ring-1 ring-inset ring-emerald-700 hover:bg-emerald-700 transition-all"><i data-lucide="banknote" class="w-4 h-4"></i> Ghi nhận Đã thu tiền</button>
+            </form>
+        {% endif %}
+        <a class="btn-primary" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>
     </div>
 </div>
 
@@ -137,7 +145,13 @@
                     <div class="text-4xl font-extrabold text-[var(--color-ink-900)]">{{ invoice.total_amount|vnd }}</div>
                     <p class="mt-3 text-[var(--color-ink-600)]">Ngày phát hành {{ invoice.issued_at|vi_datetime }}</p>
                 </div>
-                <span class="badge-soft">{{ invoice.get_status_display }}</span>
+                {% if invoice.status == 'paid' %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-1.5 text-sm font-bold text-emerald-800 ring-2 ring-inset ring-emerald-600/20 shadow-sm"><i data-lucide="check-circle" class="w-4 h-4"></i> Đã thanh toán</span>
+                {% elif invoice.status == 'issued' %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-1.5 text-sm font-bold text-sky-800 ring-2 ring-inset ring-sky-600/20 shadow-sm"><i data-lucide="send" class="w-4 h-4"></i> Đã phát hành</span>
+                {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-bold text-slate-700 ring-2 ring-inset ring-slate-500/20 shadow-sm"><i data-lucide="file-edit" class="w-4 h-4"></i> Bản nháp</span>
+                {% endif %}
             </div>
         </div>
 
@@ -148,7 +162,13 @@
             </div>
             <div class="space-y-4">
                 <div class="summary-row"><span class="text-[var(--color-ink-500)]">Mã hóa đơn</span><span class="font-semibold text-[var(--color-ink-900)]">#{{ invoice.pk }}</span></div>
-                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Trạng thái</span><span class="badge-soft">{{ invoice.get_status_display }}</span></div>
+                <div class="summary-row"><span class="text-[var(--color-ink-500)]">Trạng thái</span>{% if invoice.status == 'paid' %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-1.5 text-sm font-bold text-emerald-800 ring-2 ring-inset ring-emerald-600/20 shadow-sm"><i data-lucide="check-circle" class="w-4 h-4"></i> Đã thanh toán</span>
+                {% elif invoice.status == 'issued' %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-1.5 text-sm font-bold text-sky-800 ring-2 ring-inset ring-sky-600/20 shadow-sm"><i data-lucide="send" class="w-4 h-4"></i> Đã phát hành</span>
+                {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-bold text-slate-700 ring-2 ring-inset ring-slate-500/20 shadow-sm"><i data-lucide="file-edit" class="w-4 h-4"></i> Bản nháp</span>
+                {% endif %}</div>
                 <div class="summary-row"><span class="text-[var(--color-ink-500)]">Ngày phát hành</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.issued_at|vi_datetime }}</span></div>
                 <div class="summary-row"><span class="text-[var(--color-ink-500)]">Cập nhật gần nhất</span><span class="font-semibold text-[var(--color-ink-900)]">{{ invoice.updated_at|vi_datetime }}</span></div>
             </div>

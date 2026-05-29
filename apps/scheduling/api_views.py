@@ -26,21 +26,17 @@ class AppointmentEventsAPIView(RoleRequiredMixin, View):
             # If we know the treatment duration, we could add end time, currently let's just do start time
             # Or add a default 30 min duration
             
-            # Map status to color
-            color_map = {
-                "pending": "#94a3b8",      # Slate 400
-                "confirmed": "#38bdf8",    # Sky 400
-                "completed": "#10b981",    # Emerald 500
-                "cancelled": "#fb7185",    # Rose 400
-            }
-            bg_color = color_map.get(appt.status, "#94a3b8")
+            DOCTOR_COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f97316", "#eab308", "#14b8a6", "#06b6d4", "#6366f1", "#10b981", "#ef4444"]
+            bg_color = DOCTOR_COLORS[appt.doctor.id % len(DOCTOR_COLORS)]
+
             
             events.append({
                 "id": str(appt.pk),
-                "title": f"{appt.patient.full_name} ({appt.reason or 'Khám'})",
+                "title": f"[{appt.get_status_display()}] {appt.patient.full_name}",
                 "start": start_dt,
                 "backgroundColor": bg_color,
                 "borderColor": bg_color,
+                "textColor": "#ffffff",
                 "extendedProps": {
                     "patient_name": appt.patient.full_name,
                     "doctor_name": appt.doctor.get_full_name() or appt.doctor.username,

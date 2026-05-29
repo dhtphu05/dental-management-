@@ -111,16 +111,39 @@
                         <td>{{ invoice.treatment_plan.appointment.doctor.get_full_name|default:invoice.treatment_plan.appointment.doctor.username }}</td>
                         <td>{{ invoice.issued_at|vi_datetime }}</td>
                         <td>{{ invoice.total_amount|vnd }}</td>
-                        <td>{{ invoice.get_status_display }}</td>
+                        <td>
+                            {% if invoice.status == 'paid' %}
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+                                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Đã thanh toán
+                                </span>
+                            {% elif invoice.status == 'issued' %}
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 ring-1 ring-inset ring-sky-600/20">
+                                    <i data-lucide="send" class="w-3.5 h-3.5"></i> Đã phát hành
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-inset ring-slate-500/20">
+                                    <i data-lucide="file-edit" class="w-3.5 h-3.5"></i> Bản nháp
+                                </span>
+                            {% endif %}
+                        </td>
                         <td class="text-right">
                             <div class="row-actions">
-                                <a class="btn-secondary !px-3 !py-2 !text-xs" href="{% url 'invoice-update' invoice.pk %}"><i data-lucide="square-pen" class="icon-sm"></i>Sửa</a>
-                                <a class="btn-danger !px-3 !py-2 !text-xs" href="{% url 'invoice-delete' invoice.pk %}"><i data-lucide="trash-2" class="icon-sm"></i>Xóa</a>
+                                <a class="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors" href="{% url 'invoice-detail' invoice.pk %}" title="Xem"><i data-lucide="eye" class="w-4 h-4"></i></a>
+                                <a class="inline-flex items-center justify-center rounded-lg p-2 text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors" href="{% url 'invoice-update' invoice.pk %}" title="Sửa"><i data-lucide="square-pen" class="w-4 h-4"></i></a>
+                                <a class="inline-flex items-center justify-center rounded-lg p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 transition-colors" href="{% url 'invoice-delete' invoice.pk %}" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></a>
                             </div>
                         </td>
                     </tr>
                 {% empty %}
-                    <tr class="table-row"><td colspan="7" class="text-[var(--color-ink-500)]">Chưa có hóa đơn.</td></tr>
+                    <tr><td colspan="7" class="py-12 text-center text-slate-500">
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="mb-4 rounded-full bg-slate-100 p-4">
+                                <i data-lucide="receipt" class="w-8 h-8 text-slate-400"></i>
+                            </div>
+                            <p class="text-base font-semibold text-slate-900">Không tìm thấy hóa đơn nào</p>
+                            <p class="mt-1 text-sm text-slate-500">Thử thay đổi bộ lọc hoặc thêm hóa đơn mới từ hồ sơ điều trị.</p>
+                        </div>
+                    </td></tr>
                 {% endfor %}
             </tbody>
         </table>

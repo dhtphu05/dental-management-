@@ -92,9 +92,20 @@ class AppointmentListView(AppointmentAccessMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["doctor_options"] = CustomUser.objects.filter(role=UserRole.DOCTOR).order_by(
+        doctors = CustomUser.objects.filter(role=UserRole.DOCTOR).order_by(
             "first_name", "last_name", "username"
         )
+        DOCTOR_COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f97316", "#eab308", "#14b8a6", "#06b6d4", "#6366f1", "#10b981", "#ef4444"]
+        
+        doctor_info = []
+        for doc in doctors:
+            color = DOCTOR_COLORS[doc.id % len(DOCTOR_COLORS)]
+            doctor_info.append({
+                "id": doc.id,
+                "name": f"BS. {doc.last_name} {doc.first_name}".strip() if doc.first_name else doc.username,
+                "color": color
+            })
+        context["doctor_options"] = doctor_info
         context["status_options"] = AppointmentStatus.choices
         context["active_filters"] = {
             "q": self.request.GET.get("q", ""),
@@ -292,9 +303,20 @@ class AppointmentCalendarView(AppointmentAccessMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_title"] = "Lịch tuần"
-        context["doctor_options"] = CustomUser.objects.filter(role=UserRole.DOCTOR).order_by(
+        doctors = CustomUser.objects.filter(role=UserRole.DOCTOR).order_by(
             "first_name", "last_name", "username"
         )
+        DOCTOR_COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f97316", "#eab308", "#14b8a6", "#06b6d4", "#6366f1", "#10b981", "#ef4444"]
+        
+        doctor_info = []
+        for doc in doctors:
+            color = DOCTOR_COLORS[doc.id % len(DOCTOR_COLORS)]
+            doctor_info.append({
+                "id": doc.id,
+                "name": f"BS. {doc.last_name} {doc.first_name}".strip() if doc.first_name else doc.username,
+                "color": color
+            })
+        context["doctor_options"] = doctor_info
         from apps.scheduling.forms import AppointmentForm, SidebarAppointmentForm
         # Provide an empty form for the sidebar
         context["form"] = SidebarAppointmentForm()
