@@ -453,7 +453,57 @@
         hour12: false
       },
       selectable: true,
-                  select: function(info) {
+      editable: true,
+      eventDrop: function(info) {
+        let event = info.event;
+        let start = event.start;
+        
+        let dateStr = start.getFullYear() + '-' + String(start.getMonth() + 1).padStart(2, '0') + '-' + String(start.getDate()).padStart(2, '0');
+        let timeStr = String(start.getHours()).padStart(2, '0') + ':' + String(start.getMinutes()).padStart(2, '0');
+        
+        let url = `{% url 'api-appointment-update' 0 %}`.replace('0', event.id);
+        
+        // Show a brief loading indicator...
+        let originalEl = info.el.style.opacity;
+        info.el.style.opacity = '0.5';
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                date: dateStr,
+                time_slot: timeStr
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            info.el.style.opacity = originalEl;
+            if (data.status !== 'success') {
+                alert('Không thể dời lịch: ' + (data.message || 'Lỗi hệ thống'));
+                info.revert();
+            } else {
+                // Toast notification
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center gap-2 transform transition-all translate-y-0 opacity-100';
+                toast.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Đã dời lịch thành công';
+                document.body.appendChild(toast);
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    toast.classList.add('translate-y-4', 'opacity-0');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        })
+        .catch(err => {
+            info.el.style.opacity = originalEl;
+            alert('Lỗi kết nối');
+            info.revert();
+        });
+      },
+      select: function(info) {
         let dateStr = info.startStr.split('T')[0];
         let timeStr = info.startStr.includes('T') ? info.startStr.split('T')[1].substring(0, 5) : "";
         openCreateDrawer(dateStr, timeStr);

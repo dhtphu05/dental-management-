@@ -4,6 +4,8 @@ from apps.scheduling.models import Appointment
 from apps.accounts.mixins import RoleRequiredMixin
 from apps.accounts.models import UserRole
 
+from django.urls import reverse
+
 class AppointmentEventsAPIView(RoleRequiredMixin, View):
     allowed_roles = (UserRole.ADMIN, UserRole.RECEPTIONIST, UserRole.DOCTOR)
 
@@ -42,7 +44,7 @@ class AppointmentEventsAPIView(RoleRequiredMixin, View):
                     "doctor_name": appt.doctor.get_full_name() or appt.doctor.username,
                     "status": appt.get_status_display(),
                     "reason": appt.reason,
-                    "url": f"/scheduling/{appt.pk}/"
+                    "url": reverse("appointment-detail", args=[appt.pk])
                 }
             })
             
@@ -92,5 +94,32 @@ class PatientSearchAPIView(RoleRequiredMixin, View):
             })
         except Patient.DoesNotExist:
             return JsonResponse({"status": "not_found", "message": "Bệnh nhân chưa tồn tại trong hệ thống. Hãy nhập tên để tạo mới."}, status=404)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AppointmentUpdateAPIView(RoleRequiredMixin, View):
+    allowed_roles = (UserRole.ADMIN, UserRole.RECEPTIONIST, UserRole.DOCTOR)
+    
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            appointment = Appointment.objects.get(pk=pk)
+            
+            if request.user.role == UserRole.DOCTOR and appointment.doctor != request.user:
+                return JsonResponse({"status": "error", "message": "Không có quyền thay đổi lịch của bác sĩ khác"}, status=403)
+                
+            data = json.loads(request.body)
+            new_date = data.get('date')
+            new_time = data.get('time_slot')
+            
+            if new_date:
+                appointment.date = new_date
+            if new_time:
+                appointment.time_slot = new_time
+                
+            appointment.save()
+            return JsonResponse({"status": "success", "message": "Cập nhật thành công"})
+        except Appointment.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Không tìm thấy lịch hẹn"}, status=404)
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)

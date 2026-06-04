@@ -3,38 +3,142 @@
 
 {% block title %}Tạo tài khoản bệnh nhân{% endblock %}
 
+{% block extra_head %}
+<style>
+    .auth-input input {
+        width: 100%;
+        border-radius: 0.85rem;
+        border: 1px solid #cbd5e1;
+        padding: 0.85rem 1rem;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+        font-weight: 500;
+        background: #F8FAFC;
+    }
+    .auth-input input:focus {
+        border-color: var(--color-brand-500);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px var(--color-brand-50);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="mx-auto max-w-3xl">
-    <div class="surface-card fade-in">
-        <div class="mb-6">
-            <span class="badge-soft mb-3">Tạo tài khoản</span>
-            <h1 class="mb-2">Hoàn tất tài khoản bệnh nhân</h1>
-            <p class="section-subtitle">Bạn đã đặt lịch thành công. Bây giờ hãy tạo mật khẩu để dùng số điện thoại đăng nhập và theo dõi lịch khám.</p>
+<div class="mx-auto max-w-5xl pt-4 pb-12 fade-in">
+    <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden flex flex-col md:flex-row border border-slate-100">
+        
+        <!-- Left Side: Information -->
+        <div class="md:w-5/12 p-8 md:p-12 text-white flex flex-col justify-between relative overflow-hidden" style="background: linear-gradient(135deg, #1565C0 0%, #0f172a 100%);">
+            <!-- Decorative circle -->
+            <div class="absolute top-[-10%] right-[-10%] w-[350px] h-[350px] bg-white opacity-[0.03] rounded-full blur-2xl"></div>
+            <div class="absolute bottom-[-20%] left-[-10%] w-[250px] h-[250px] bg-brand-500 opacity-20 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10 w-full mb-8">
+                <a href="{% url 'booking-success' %}" class="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-10 transition-colors text-sm font-semibold opacity-90 hover:opacity-100">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Phiếu đặt hẹn
+                </a>
+                
+                <h2 class="text-[1.75rem] font-extrabold mb-4 leading-tight text-white" style="color: #ffffff !important;">Mở khóa<br>hồ sơ y tế số</h2>
+                <p class="text-blue-100/90 text-[0.95rem] leading-relaxed mb-10">Bảo mật thông tin nội bộ cá nhân. Chỉ với một vài thao tác, bạn đã có ngay một tài khoản y tế an toàn.</p>
+                
+                <ul class="space-y-6">
+                    <li class="flex items-start gap-4">
+                        <div class="bg-white/10 text-white rounded-xl p-2.5 mt-0.5 shadow-sm border border-white/5 backdrop-blur-md">
+                            <i data-lucide="history" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white mb-0.5">Lịch sử khám</div>
+                            <div class="text-sm font-medium text-blue-100/80 leading-snug">Xem lại chi tiết bệnh án và hóa đơn</div>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="bg-white/10 text-white rounded-xl p-2.5 mt-0.5 shadow-sm border border-white/5 backdrop-blur-md">
+                            <i data-lucide="file-check-2" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white mb-0.5">Bảo mật hồ sơ răng</div>
+                            <div class="text-sm font-medium text-blue-100/80 leading-snug">Tra cứu cấu trúc răng riêng biệt</div>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="bg-white/10 text-white rounded-xl p-2.5 mt-0.5 shadow-sm border border-white/5 backdrop-blur-md">
+                            <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white mb-0.5">Quản lý lịch hẹn</div>
+                            <div class="text-sm font-medium text-blue-100/80 leading-snug">Dễ dàng xem, dời đổi ngày khám tiếp</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="relative z-10 text-xs text-blue-200/60 font-medium">
+                © Hệ thống Phòng Khám Thông Minh
+            </div>
         </div>
 
-        <div class="mb-6 grid gap-4 md:grid-cols-2">
-            <div class="summary-row"><span class="text-ink-500">Bác sĩ</span><span class="font-semibold text-ink-900">{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</span></div>
-            <div class="summary-row"><span class="text-ink-500">Lịch hẹn</span><span class="font-semibold text-brand-700">{{ appointment.date|vi_date_long }} - {{ appointment.time_slot|vi_time }}</span></div>
+        <!-- Right Side: Form -->
+        <div class="md:w-7/12 p-8 md:p-12 relative flex flex-col justify-center">
+            <h3 class="text-2xl md:text-[1.65rem] font-bold text-ink-900 mb-2">Tạo mật khẩu đăng nhập</h3>
+            <p class="text-ink-500 text-sm mb-8 leading-relaxed">Để bảo vệ thông tin sức khỏe trực tuyến của bạn, vui lòng tạo mật khẩu cho số điện thoại đã đăng ký lịch.</p>
+            
+            <!-- Context card -->
+            <div class="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-4 mb-8 flex items-center gap-4">
+                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-brand-700 text-xl font-black border border-slate-100">
+                    {{ appointment.patient.full_name|slice:":1"|upper }}
+                </div>
+                <div>
+                    <div class="font-bold text-ink-900">{{ appointment.patient.full_name }}</div>
+                    <div class="text-sm text-ink-500 font-medium font-mono tracking-wider mt-0.5">{{ appointment.patient.phone }}</div>
+                </div>
+                <div class="ml-auto flex items-center gap-1.5 text-xs font-bold text-green-600 bg-green-50 px-2.5 py-1.5 rounded-lg border border-green-100">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i> Đã kích hoạt
+                </div>
+            </div>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-sm font-medium">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+                
+                <div class="grid gap-6">
+                    {% for field in form %}
+                        {% if field.name == 'phone' %}
+                            <!-- Hide phone -->
+                            <div class="hidden">{{ field }}</div>
+                        {% else %}
+                            <div class="auth-input">
+                                <label class="flex justify-between items-baseline mb-2">
+                                    <span class="block text-sm font-bold text-ink-700">{{ field.label }}</span>
+                                    {% if field.name == 'password1' %}
+                                        <span class="font-medium text-[0.7rem] uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">Tối thiểu 8 ký tự</span>
+                                    {% endif %}
+                                </label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="mt-1.5 flex items-center gap-1.5 text-[0.8rem] font-medium text-rose-600">
+                                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="pt-6 mt-6 border-t border-slate-100">
+                    <button type="submit" class="w-full text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 flex justify-center items-center gap-2 text-[0.95rem] hover:opacity-90" style="background-color: #1565C0;">
+                        Kích hoạt tài khoản trực tuyến
+                    </button>
+                    <p class="text-center text-xs text-ink-400 mt-5 leading-relaxed font-medium">
+                        Bằng việc xác nhận, bạn đóng vai trò là chủ sở hữu hợp pháp của <br>thông tin bệnh án điện tử này.
+                    </p>
+                </div>
+            </form>
         </div>
-
-        <form method="post">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-            <div class="grid gap-5">
-                {% for field in form %}
-                    <div>
-                        <label class="mb-2 block text-sm font-semibold text-ink-700">{{ field.label }}</label>
-                        {{ field }}
-                        {% for error in field.errors %}<div class="mt-2 text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
-                    </div>
-                {% endfor %}
-            </div>
-
-            <div class="mt-8 flex flex-wrap gap-3">
-                <button class="btn-primary" type="submit"><i data-lucide="shield-check" class="icon-sm"></i>Tạo tài khoản</button>
-                <a class="btn-secondary" href="{% url 'booking-success' %}"><i data-lucide="arrow-left" class="icon-sm"></i>Quay lại</a>
-            </div>
-        </form>
+        
     </div>
 </div>
 {% endblock %}

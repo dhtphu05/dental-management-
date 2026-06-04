@@ -29,8 +29,8 @@
             <select id="id_doctor" name="doctor">
                 <option value="">Tất cả bác sĩ</option>
                 {% for doctor in doctor_options %}
-                    <option value="{{ doctor.pk }}" {% if active_filters.doctor == doctor.pk|stringformat:"s" %}selected{% endif %}>
-                        {{ doctor.get_full_name|default:doctor.username }}
+                    <option value="{{ doctor.id }}" {% if active_filters.doctor == doctor.id|stringformat:"s" %}selected{% endif %}>
+                        {{ doctor.name }}
                     </option>
                 {% endfor %}
             </select>

@@ -341,7 +341,7 @@ class PatientRegistrationFlowTests(TestCase):
         response = self.client.get(reverse("patient-register"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Đăng ký bệnh nhân")
+        self.assertContains(response, "Đăng ký tài khoản")
 
     def test_patient_can_register_and_is_logged_in(self):
         response = self.client.post(

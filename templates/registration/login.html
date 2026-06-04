@@ -2,52 +2,110 @@
 
 {% block title %}Đăng nhập{% endblock %}
 
+{% block extra_head %}
+<style>
+    .auth-input input {
+        width: 100%;
+        border-radius: 0.85rem;
+        border: 1px solid #cbd5e1;
+        padding: 0.85rem 1rem;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+        font-weight: 500;
+        background: #F8FAFC;
+    }
+    .auth-input input:focus {
+        border-color: var(--color-brand-500);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px var(--color-brand-50);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="mx-auto max-w-md">
-    <div class="hero-panel fade-in">
-        <div class="mb-8">
-            <span class="badge-soft mb-3">Đăng nhập hệ thống</span>
-            <h1 class="mb-2">Đăng nhập</h1>
-            <p class="section-subtitle">Bệnh nhân đăng nhập bằng số điện thoại. Quản trị viên, lễ tân và bác sĩ đăng nhập bằng username.</p>
-        </div>
-        <form method="post" class="space-y-5">
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-                <div class="rounded-[24px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600">
-                    {{ form.non_field_errors }}
+<div class="mx-auto max-w-5xl pt-4 pb-12 fade-in">
+    <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden flex flex-col md:flex-row border border-slate-100 min-h-[550px]">
+        
+        <!-- Left Side: Graphic / Branding -->
+        <div class="md:w-5/12 p-8 md:p-12 text-white flex flex-col justify-center relative overflow-hidden" style="background: linear-gradient(135deg, #1565C0 0%, #0f172a 100%);">
+            <!-- Decorative circle -->
+            <div class="absolute top-[-10%] right-[-10%] w-[350px] h-[350px] bg-white opacity-[0.03] rounded-full blur-2xl"></div>
+            <div class="absolute bottom-[-20%] left-[-10%] w-[250px] h-[250px] bg-brand-500 opacity-20 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10 w-full">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 border border-white/20 mb-8 backdrop-blur-md shadow-lg">
+                    <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
                 </div>
-            {% endif %}
-
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ form.username.id_for_label }}">
-                    {{ form.username.label }}
-                </label>
-                {{ form.username }}
-                {% for error in form.username.errors %}
-                    <div class="text-sm font-medium text-rose-600">{{ error }}</div>
-                {% endfor %}
+                <h2 class="text-[1.85rem] font-extrabold mb-4 leading-tight text-white" style="color: #ffffff !important;">Chào mừng<br>trở lại</h2>
+                <p class="text-blue-100/90 text-[1rem] leading-relaxed mb-8">Nền tảng quản lý hồ sơ y khoa an toàn và bảo mật.</p>
+                
+                <div class="mt-8 pt-8 border-t border-white/10 text-sm font-medium text-blue-200/80" style="border-top-color: rgba(255, 255, 255, 0.1);">
+                    <p class="flex items-center gap-2 mb-2"><i data-lucide="info" class="w-4 h-4"></i> Hướng dẫn đăng nhập:</p>
+                    <ul class="space-y-1.5 opacity-90 pl-6 list-disc list-outside">
+                        <li>Bệnh nhân: Số điện thoại</li>
+                        <li>Nhân sự: Tên đăng nhập (Username)</li>
+                    </ul>
+                </div>
             </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ form.password.id_for_label }}">
-                    {{ form.password.label }}
-                </label>
-                {{ form.password }}
-                {% for error in form.password.errors %}
-                    <div class="text-sm font-medium text-rose-600">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <button class="btn-primary mt-2 w-full !justify-center !rounded-[1.4rem] !py-4 !text-lg" type="submit">
-                <i data-lucide="log-in" class="icon-sm"></i>Đăng nhập
-            </button>
-        </form>
-        <div class="mt-6 rounded-[1.6rem] bg-white/70 px-5 py-4 text-sm text-[var(--color-ink-700)]">
-            Chưa có tài khoản bệnh nhân?
-            <a class="ml-2 font-semibold text-[var(--color-brand-700)] hover:underline" href="{% url 'patient-register' %}">
-                Đăng ký ngay
-            </a>
+            
         </div>
+
+        <!-- Right Side: Form -->
+        <div class="md:w-7/12 p-8 md:p-14 relative flex flex-col justify-center">
+            
+            <div class="mb-8">
+                <span class="inline-block px-3 py-1 bg-brand-50 text-brand-700 font-bold text-xs uppercase tracking-wider rounded-lg mb-3">Đăng nhập hệ thống</span>
+                <h3 class="text-2xl md:text-[1.75rem] font-bold text-ink-900 mb-2">Đăng nhập tài khoản</h3>
+                <p class="text-ink-500 text-sm leading-relaxed">Vui lòng nhập thông tin xác thực để bắt đầu phiên làm việc.</p>
+            </div>
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-sm font-medium mb-4 flex gap-2 items-start">
+                    <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                    <div>{{ form.non_field_errors }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="auth-input">
+                    <label class="block text-sm font-bold text-ink-700 mb-2" for="{{ form.username.id_for_label }}">Tên đăng nhập / Số điện thoại</label>
+                    {{ form.username }}
+                    {% for error in form.username.errors %}
+                        <div class="mt-1.5 flex items-center gap-1.5 text-[0.8rem] font-medium text-rose-600">
+                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="auth-input">
+                    <div class="flex justify-between items-baseline mb-2">
+                        <label class="block text-sm font-bold text-ink-700" for="{{ form.password.id_for_label }}">Mật khẩu</label>
+                    </div>
+                    {{ form.password }}
+                    {% for error in form.password.errors %}
+                        <div class="mt-1.5 flex items-center gap-1.5 text-[0.8rem] font-medium text-rose-600">
+                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 flex justify-center items-center gap-2 text-[0.95rem] hover:opacity-90" style="background-color: #1565C0;">
+                        Truy cập an toàn <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-8 text-center border-t border-slate-100 pt-6">
+                <p class="text-sm font-medium text-ink-500">
+                    Bạn tải hồ sơ đặt lịch công khai lần đầu? 
+                    <a href="{% url 'patient-register' %}" class="text-brand-600 font-bold hover:text-brand-800 transition-colors ml-1 hover:underline">Tạo tài khoản theo dõi</a>
+                </p>
+            </div>
+            
+        </div>
+        
     </div>
 </div>
 {% endblock %}

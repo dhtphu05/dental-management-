@@ -4,39 +4,86 @@
 {% block title %}Đặt lịch thành công{% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-4xl space-y-6">
-    <section class="hero-panel fade-in">
-        <span class="badge-soft mb-4">Đặt lịch thành công</span>
-        <h1 class="mb-3">Lịch hẹn của bạn đã được ghi nhận</h1>
-        <p class="section-subtitle">Chúng tôi đã lưu thông tin lịch khám. Bước tiếp theo là tạo tài khoản để bạn dễ theo dõi lịch hẹn và hồ sơ khám trong những lần sau.</p>
-    </section>
+<div class="mx-auto max-w-3xl space-y-6 pt-4 pb-12">
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden relative fade-in border border-slate-100">
+        <!-- Decoration Header -->
+        <div class="absolute top-0 left-0 w-full h-40 bg-gradient-to-br from-green-50 to-emerald-100/50"></div>
+        
+        <div class="relative z-10 px-6 pt-12 pb-8 text-center sm:px-12">
+            <!-- Big Checkmark -->
+            <div class="mx-auto inline-flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-white text-green-500 shadow-xl shadow-green-500/20 ring-8 ring-green-50">
+                <i data-lucide="check" stroke-width="3" class="w-12 h-12"></i>
+            </div>
+            
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-ink-900 mb-3 tracking-tight">Thành công!</h1>
+            <p class="text-ink-500 mb-10 max-w-lg mx-auto text-lg leading-relaxed">
+                Yêu cầu đặt lịch hẹn của bạn đã được ghi nhận. Chúng tôi sẽ sớm liên hệ xác nhận qua số điện thoại 
+                <strong class="text-ink-900">{{ appointment.patient.phone }}</strong>.
+            </p>
 
-    <section class="surface-card fade-in-delay-1">
-        <h2 class="section-title !text-xl">Thông tin lịch hẹn</h2>
-        <div class="mt-5 grid gap-4 md:grid-cols-2">
-            <div class="summary-row"><span class="text-ink-500">Bệnh nhân</span><span class="font-semibold text-ink-900">{{ appointment.patient.full_name }}</span></div>
-            <div class="summary-row"><span class="text-ink-500">Số điện thoại</span><span class="font-semibold text-ink-900">{{ appointment.patient.phone }}</span></div>
-            <div class="summary-row"><span class="text-ink-500">Bác sĩ</span><span class="font-semibold text-ink-900">{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</span></div>
-            <div class="summary-row"><span class="text-ink-500">Ngày giờ</span><span class="font-semibold text-brand-700">{{ appointment.date|vi_date_long }} - {{ appointment.time_slot|vi_time }}</span></div>
+            <!-- Ticket Look -->
+            <div class="text-left mx-auto max-w-md bg-white border border-slate-200 rounded-2xl shadow-sm relative overflow-hidden">
+                <!-- Hole left -->
+                <div class="absolute w-6 h-6 bg-green-50 border-r border-slate-200 rounded-full -left-3 top-[76px] shadow-inner"></div>
+                <!-- Hole right -->
+                <div class="absolute w-6 h-6 bg-green-50 border-l border-slate-200 rounded-full -right-3 top-[76px] shadow-inner"></div>
+                
+                <div class="p-5 border-b-2 border-dashed border-slate-200">
+                    <div class="uppercase tracking-widest text-xs font-bold text-ink-500 mb-1">Phiếu khám bệnh</div>
+                    <div class="text-lg font-bold text-brand-700">{{ appointment.patient.full_name }}</div>
+                </div>
+                <!-- Remove border-l and border-r around ticket visually clashing with the background -->
+                <div class="p-6 grid gap-5 bg-slate-50/60">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0 border border-slate-100">
+                            <i data-lucide="calendar" class="w-5 h-5 text-brand-500"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-ink-900 mb-0.5">{{ appointment.date|vi_date_long }}</div>
+                            <div class="text-xs font-medium text-ink-500 px-2 py-0.5 bg-slate-200/60 rounded-full inline-block">{{ appointment.time_slot|vi_time }}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0 border border-slate-100">
+                            <i data-lucide="user" class="w-5 h-5 text-brand-500"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-ink-500 uppercase tracking-wide font-bold mb-0.5">Bác sĩ phụ trách</div>
+                            <div class="text-sm font-semibold text-ink-900">{{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
 
-    <section class="surface-card fade-in-delay-2">
-        {% if can_create_account %}
-            <h2 class="section-title !text-xl">Hãy tạo tài khoản để theo dõi lịch khám</h2>
-            <p class="section-subtitle mb-5">Tài khoản bệnh nhân giúp bạn xem lại lịch hẹn, lịch sử khám và các cập nhật liên quan về sau.</p>
-            <div class="flex flex-wrap gap-3">
-                <a class="btn-primary" href="{% url 'booking-create-account' %}"><i data-lucide="user-plus" class="icon-sm"></i>Tạo tài khoản ngay</a>
-                <a class="btn-secondary" href="{% url 'public-booking' %}"><i data-lucide="calendar-plus-2" class="icon-sm"></i>Đặt thêm lịch khác</a>
-            </div>
-        {% else %}
-            <h2 class="section-title !text-xl">Số điện thoại này đã có tài khoản</h2>
-            <p class="section-subtitle mb-5">Bạn có thể đăng nhập ngay để theo dõi lịch hẹn vừa đặt.</p>
-            <div class="flex flex-wrap gap-3">
-                <a class="btn-primary" href="{% url 'login' %}"><i data-lucide="log-in" class="icon-sm"></i>Đăng nhập</a>
-                <a class="btn-secondary" href="{% url 'public-booking' %}"><i data-lucide="calendar-plus-2" class="icon-sm"></i>Đặt thêm lịch khác</a>
-            </div>
-        {% endif %}
-    </section>
+    <!-- Account Details Zone -->
+    {% if can_create_account %}
+    <div class="rounded-3xl shadow-lg fade-in-delay-1 p-8 sm:p-10 text-center sm:text-left sm:flex sm:items-center sm:justify-between relative overflow-hidden text-white" style="background: linear-gradient(135deg, #1565C0 0%, #0f172a 100%);">
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
+        <div class="mb-6 sm:mb-0 sm:mr-8 relative z-10">
+            <h2 class="text-2xl font-bold text-white mb-2" style="color: #ffffff !important;">Kích hoạt tài khoản theo dõi</h2>
+            <p class="text-blue-100/90 text-sm max-w-sm leading-relaxed">
+                Sau lưng mỗi lịch khám khỏe mạnh là một tài khoản an toàn. Giúp bạn xem lại lịch sử bệnh án, răng hàm và các hóa đơn dịch vụ bất kì lúc nào.
+            </p>
+        </div>
+        <a href="{% url 'booking-create-account' %}" class="inline-flex items-center gap-2 bg-white text-brand-700 hover:bg-brand-50 px-8 py-3.5 rounded-xl font-bold overflow-hidden transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 whitespace-nowrap relative z-10">
+            Tạo mật khẩu ngay <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+    </div>
+    {% else %}
+    <div class="bg-white border border-slate-200 rounded-3xl p-8 fade-in-delay-1 text-center shadow-sm">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-brand-50 text-brand-700 border border-brand-100 mb-4 shadow-sm">
+            <i data-lucide="user-check" class="w-6 h-6"></i>
+        </div>
+        <h2 class="text-xl font-bold mb-2 text-ink-900">Đã có tài khoản tại phòng khám</h2>
+        <p class="text-ink-500 mb-6 max-w-md mx-auto text-sm leading-relaxed">Số điện thoại của bạn đã được liên kết với hệ thống. Hãy đăng nhập để kiểm tra lịch vừa gửi và xem lại bệnh án cũ.</p>
+        <a href="{% url 'login' %}" class="btn-primary inline-flex md:px-8">Đăng nhập tài khoản</a>
+    </div>
+    {% endif %}
+    
+    <div class="text-center pt-4 fade-in-delay-2">
+        <a href="{% url 'home' %}" class="text-ink-500 hover:text-brand-700 font-semibold transition-colors inline-flex items-center gap-2"><i data-lucide="home" class="w-4 h-4"></i> Trở về trang chủ</a>
+    </div>
 </div>
 {% endblock %}

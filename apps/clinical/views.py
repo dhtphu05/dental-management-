@@ -80,7 +80,8 @@ class DoctorTreatmentPlanUpdateView(RoleRequiredMixin, UpdateView):
         return treatment_plan
 
     def get_success_url(self):
-        return redirect("dashboard").url
+        from django.urls import reverse
+        return reverse("appointment-detail", kwargs={"pk": self.object.appointment.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

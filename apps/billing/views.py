@@ -147,7 +147,7 @@ class InvoiceUpdateView(InvoiceAccessMixin, UpdateView):
     template_name = "shared/form.html"
 
     def get_success_url(self):
-        return reverse_lazy("invoice-detail", kwargs={"pk": self.object.pk})
+        return reverse_lazy("invoice-list")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

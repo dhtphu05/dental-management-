@@ -243,6 +243,9 @@ class PatientTeethView(RoleRequiredMixin, TemplateView):
             patient = self.request.user.patient_profile
         else:
             patient_id = self.request.GET.get("patient_id")
+            if not patient_id:
+                from django.core.exceptions import PermissionDenied
+                raise PermissionDenied("Patient ID is required for clinical staff.")
             patient = get_object_or_404(Patient, pk=patient_id)
             
         teeth = patient.teeth.select_related('last_updated_by').all()

@@ -13,12 +13,13 @@ from apps.scheduling.views import (
 
 
 from apps.scheduling.views import AppointmentCalendarView
-from apps.scheduling.api_views import AppointmentEventsAPIView, AppointmentCreateAPIView, PatientSearchAPIView
+from apps.scheduling.api_views import AppointmentEventsAPIView, AppointmentCreateAPIView, PatientSearchAPIView, AppointmentUpdateAPIView
 
 urlpatterns = [
     path("calendar/", AppointmentCalendarView.as_view(), name="appointment-calendar"),
             path("api/patients/search/", PatientSearchAPIView.as_view(), name="api-patient-search"),
     path("api/events/create/", AppointmentCreateAPIView.as_view(), name="api-appointment-create"),
+    path("api/events/<int:pk>/update/", AppointmentUpdateAPIView.as_view(), name="api-appointment-update"),
     path("api/events/", AppointmentEventsAPIView.as_view(), name="api-appointment-events"),
 
     path("booking/", PublicBookingView.as_view(), name="public-booking"),

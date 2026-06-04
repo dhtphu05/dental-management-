@@ -1,61 +1,144 @@
 {% extends "base.html" %}
 
-{% block title %}Đăng ký bệnh nhân{% endblock %}
+{% block title %}Đăng ký tài khoản{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-input input {
+        width: 100%;
+        border-radius: 0.85rem;
+        border: 1px solid #cbd5e1;
+        padding: 0.85rem 1rem;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+        font-weight: 500;
+        background: #F8FAFC;
+    }
+    .auth-input input:focus {
+        border-color: var(--color-brand-500);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px var(--color-brand-50);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-xl">
-    <div class="hero-panel fade-in">
-        <div class="mb-8">
-            <span class="badge-soft mb-3">Tạo tài khoản bệnh nhân</span>
-            <h1 class="mb-2">Đăng ký</h1>
-            <p class="section-subtitle">Đăng ký bằng số điện thoại để theo dõi lịch hẹn, lịch sử khám và hóa đơn của bạn.</p>
+<div class="mx-auto max-w-5xl pt-4 pb-12 fade-in">
+    <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden flex flex-col md:flex-row border border-slate-100 min-h-[550px]">
+        
+        <!-- Left Side: Graphic / Branding -->
+        <div class="md:w-5/12 p-8 md:p-12 text-white flex flex-col justify-center relative overflow-hidden" style="background: linear-gradient(135deg, #059669 0%, #064e3b 100%);">
+            <!-- Decorative circle -->
+            <div class="absolute top-[-10%] right-[-10%] w-[350px] h-[350px] bg-white opacity-[0.03] rounded-full blur-2xl"></div>
+            <div class="absolute bottom-[-20%] left-[-10%] w-[250px] h-[250px] bg-emerald-500 opacity-20 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10 w-full">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 border border-white/20 mb-8 backdrop-blur-md shadow-lg">
+                    <i data-lucide="user-plus" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="text-[1.85rem] font-extrabold mb-4 leading-tight text-white" style="color: #ffffff !important;">Đăng ký<br>hồ sơ trực tuyến</h2>
+                <p class="text-teal-100/90 text-[1rem] leading-relaxed mb-10">Bạn là bệnh nhân mới? Hãy tạo ngay một tài khoản để nhận được sự chăm sóc y tế toàn diện nhất từ chúng tôi.</p>
+                
+                <ul class="space-y-6">
+                    <li class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shadow-sm shrink-0">
+                            <span class="font-bold text-sm">1</span>
+                        </div>
+                        <div class="text-sm font-medium text-teal-50">Tạo tài khoản bằng số điện thoại</div>
+                    </li>
+                    <li class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shadow-sm shrink-0">
+                            <span class="font-bold text-sm">2</span>
+                        </div>
+                        <div class="text-sm font-medium text-teal-50">Trải nghiệm đặt lịch nhanh chóng</div>
+                    </li>
+                    <li class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shadow-sm shrink-0">
+                            <span class="font-bold text-sm">3</span>
+                        </div>
+                        <div class="text-sm font-medium text-teal-50">Lưu lại toàn bộ lịch sử Răng - Hàm</div>
+                    </li>
+                </ul>
+            </div>
+            
         </div>
 
-        <form method="post" class="space-y-5">
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-                <div class="rounded-[24px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600">
-                    {{ form.non_field_errors }}
-                </div>
-            {% endif %}
-
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}</label>
-                {{ form.full_name }}
-                <div class="text-sm text-[var(--color-ink-500)]">Vui lòng nhập đúng họ và tên để hiển thị trên lịch hẹn và hồ sơ khám.</div>
-                {% for error in form.full_name.errors %}<div class="text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+        <!-- Right Side: Form -->
+        <div class="md:w-7/12 p-8 md:p-14 relative flex flex-col justify-center">
+            
+            <div class="mb-8">
+                <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 font-bold text-xs uppercase tracking-wider rounded-lg mb-3">Dành cho bệnh nhân mới</span>
+                <h3 class="text-2xl md:text-[1.75rem] font-bold text-ink-900 mb-2">Thông tin đăng ký</h3>
+                <p class="text-ink-500 text-sm leading-relaxed">Chúng tôi cam kết bảo mật tuyệt đối các thông tin y khoa của bạn.</p>
             </div>
 
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
-                {{ form.phone }}
-                <div class="text-sm text-[var(--color-ink-500)]">Dùng số điện thoại này để đăng nhập và nhận hỗ trợ từ phòng khám.</div>
-                {% for error in form.phone.errors %}<div class="text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
-            </div>
-
-            <div class="grid gap-5 md:grid-cols-2">
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
-                    {{ form.password1 }}
-                    {% if form.password1.help_text %}<div class="text-sm text-[var(--color-ink-500)]">{{ form.password1.help_text }}</div>{% endif %}
-                    {% for error in form.password1.errors %}<div class="text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-sm font-medium mb-4 flex gap-2 items-start">
+                    <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                    <div>{{ form.non_field_errors }}</div>
                 </div>
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-[var(--color-ink-700)]" for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
-                    {{ form.password2 }}
-                    {% for error in form.password2.errors %}<div class="text-sm font-medium text-rose-600">{{ error }}</div>{% endfor %}
+                {% endif %}
+                
+                <div class="grid md:grid-cols-2 gap-5">
+                    <div class="auth-input md:col-span-2">
+                        <label class="block text-sm font-bold text-ink-700 mb-2" for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}</label>
+                        {{ form.full_name }}
+                        {% for error in form.full_name.errors %}
+                            <div class="mt-1.5 flex items-center gap-1.5 text-[0.8rem] font-medium text-rose-600">
+                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="auth-input md:col-span-2">
+                        <label class="block text-sm font-bold text-ink-700 mb-2" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                        {{ form.phone }}
+                        {% for error in form.phone.errors %}
+                            <div class="mt-1.5 flex items-center gap-1.5 text-[0.8rem] font-medium text-rose-600">
+                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="auth-input">
+                        <label class="block text-sm font-bold text-ink-700 mb-2" for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                        {{ form.password1 }}
+                        {% for error in form.password1.errors %}
+                            <div class="mt-1.5 flex items-center gap-1.5 text-[0.8rem] font-medium text-rose-600">
+                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="auth-input">
+                        <label class="block text-sm font-bold text-ink-700 mb-2" for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                        {{ form.password2 }}
+                        {% for error in form.password2.errors %}
+                            <div class="mt-1.5 flex items-center gap-1.5 text-[0.8rem] font-medium text-rose-600">
+                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
+
+                <div class="pt-6 mt-4">
+                    <button type="submit" class="w-full text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 flex justify-center items-center gap-2 text-[0.95rem] hover:opacity-90" style="background-color: #059669;">
+                        Hoàn tất đăng ký <i data-lucide="check" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-8 text-center border-t border-slate-100 pt-6">
+                <p class="text-sm font-medium text-ink-500">
+                    Bạn đã có tài khoản theo dõi?
+                    <a href="{% url 'login' %}" class="text-emerald-700 font-bold hover:text-emerald-900 transition-colors ml-1 hover:underline">Đăng nhập</a>
+                </p>
             </div>
-
-            <button class="btn-primary mt-2 w-full !justify-center !rounded-[1.4rem] !py-4 !text-lg" type="submit">
-                <i data-lucide="user-round-plus" class="icon-sm"></i>Đăng ký tài khoản
-            </button>
-        </form>
-
-        <div class="mt-6 text-center text-sm text-[var(--color-ink-500)]">
-            Đã có tài khoản?
-            <a class="font-semibold text-[var(--color-brand-700)]" href="{% url 'login' %}">Đăng nhập ngay</a>
+            
         </div>
+        
     </div>
 </div>
 {% endblock %}
